@@ -7,6 +7,7 @@
 #include <cassert>
 #include "agent.hpp"
 #include "random_agent.hpp"
+#include "human_agent.hpp"
 #include <memory>
 
 int main()
@@ -14,7 +15,7 @@ int main()
     board _board{8};
 
     auto black_agent = std::unique_ptr<agent>(new random_agent{});
-    auto white_agent = std::unique_ptr<agent>(new random_agent{});
+    auto white_agent = std::unique_ptr<agent>(new human_agent{});
 
     while (true)
     {

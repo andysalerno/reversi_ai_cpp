@@ -23,7 +23,6 @@ void board::flip_piece(coord xy)
 
 bool board::is_full()
 {
-    std::cout << this->get_amount_black() << ", " << this->get_amount_white() << ", " << pow(this->get_size(), 2) << '\n';
     return (this->get_amount_black() + this->get_amount_white() == pow(this->get_size(), 2));
 }
 
