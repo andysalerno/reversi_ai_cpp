@@ -1,7 +1,8 @@
 #include "board.hpp"
 #include <cmath>
+#include <iostream>
 
-board::board(size_t size) : size(size), board_vec(size, std::vector<Piece>(size, black)), amount_black_pieces(0), amount_white_pieces(0)
+board::board(size_t size) : size(size), board_vec(size, std::vector<Piece>(size, empty)), amount_black_pieces(0), amount_white_pieces(0)
 {
     this->clear();
 }
@@ -22,6 +23,7 @@ void board::flip_piece(coord xy)
 
 bool board::is_full()
 {
+    std::cout << this->get_amount_black() << ", " << this->get_amount_white() << ", " << pow(this->get_size(), 2) << '\n';
     return (this->get_amount_black() + this->get_amount_white() == pow(this->get_size(), 2));
 }
 
@@ -37,6 +39,7 @@ unsigned board::get_amount_white()
 
 void board::clear()
 {
+    this->amount_black_pieces = this->amount_white_pieces = 0;
     std::fill(this->board_vec.begin(), this->board_vec.end(), std::vector<Piece>(this->size, empty));
 }
 

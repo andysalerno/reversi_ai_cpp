@@ -16,7 +16,16 @@ int main()
     auto black_agent = std::unique_ptr<agent>(new random_agent{});
     auto white_agent = std::unique_ptr<agent>(new random_agent{});
 
-    play_game(_board, black_agent, white_agent);
+    while (true)
+    {
+        play_game(_board, black_agent, white_agent);
+        if (!_board.is_full())
+        {
+            std::cout << "board not full!\n";
+            break;
+        }
+        initialize_reversi_board(_board);
+    }
 }
 
 void play_game(board &_board, std::unique_ptr<agent> &black_agent, std::unique_ptr<agent> &white_agent)
@@ -24,25 +33,43 @@ void play_game(board &_board, std::unique_ptr<agent> &black_agent, std::unique_p
     initialize_reversi_board(_board);
 
     std::cout << _board.stringify();
-    while (!is_game_over(_board))
+    while (true)
     {
+        if (is_game_over(_board))
+        {
+            break;
+        }
+
         // black makes a move (if it can)
         auto legal_black = legal_moves(_board, black);
         if (legal_black.size() > 0)
         {
             coord move = black_agent->pick_move(_board, legal_black);
-            std::cout << move.stringify() << '\n';
+            std::cout << "Black plays at: " << move.stringify() << '\n';
             apply_move(_board, move, black);
         }
+        else
+        {
+            std::cout << "Black has no moves, passes turn.\n";
+        }
         std::cout << _board.stringify();
+
+        if (is_game_over(_board))
+        {
+            break;
+        }
 
         // white makes a move (if it can)
         auto legal_white = legal_moves(_board, white);
         if (legal_white.size() > 0)
         {
             coord move = white_agent->pick_move(_board, legal_white);
-            std::cout << move.stringify() << '\n';
+            std::cout << "White plays at: " << move.stringify() << '\n';
             apply_move(_board, move, white);
+        }
+        else
+        {
+            std::cout << "White has no moves, passes turn.\n";
         }
         std::cout << _board.stringify();
     }
