@@ -5,14 +5,21 @@
 #include <iostream>
 #include "util.hpp"
 #include <cassert>
+#include "agent.hpp"
+#include "random_agent.hpp"
+#include <memory>
 
 int main()
 {
     board _board{8};
-    play_game(_board);
+
+    auto black_agent = std::unique_ptr<agent>(new random_agent{});
+    auto white_agent = std::unique_ptr<agent>(new random_agent{});
+
+    play_game(_board, black_agent, white_agent);
 }
 
-void play_game(board &_board)
+void play_game(board &_board, std::unique_ptr<agent> &black_agent, std::unique_ptr<agent> &white_agent)
 {
     initialize_reversi_board(_board);
 
@@ -23,7 +30,7 @@ void play_game(board &_board)
         auto legal_black = legal_moves(_board, black);
         if (legal_black.size() > 0)
         {
-            coord move = vec_pick_random(legal_black);
+            coord move = black_agent->pick_move(_board, legal_black);
             std::cout << move.stringify() << '\n';
             apply_move(_board, move, black);
         }
@@ -33,7 +40,7 @@ void play_game(board &_board)
         auto legal_white = legal_moves(_board, white);
         if (legal_white.size() > 0)
         {
-            coord move = vec_pick_random(legal_white);
+            coord move = white_agent->pick_move(_board, legal_white);
             std::cout << move.stringify() << '\n';
             apply_move(_board, move, white);
         }

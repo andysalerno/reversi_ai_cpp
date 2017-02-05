@@ -3,9 +3,11 @@
 
 #include "board.hpp"
 #include <vector>
+#include <memory>
+#include "agent.hpp"
 
 void initialize_reversi_board(board &);
-void play_game(board &);
+void play_game(board &, std::unique_ptr<agent> &, std::unique_ptr<agent> &);
 bool is_legal_move(coord &, board &, Piece);
 std::vector<coord> legal_moves(board &, Piece);
 Piece opponent(Piece);
