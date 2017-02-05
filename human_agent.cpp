@@ -1,5 +1,7 @@
 #include "human_agent.hpp"
 #include <iostream>
+#include <algorithm>
+#include <vector>
 #include <string>
 
 coord human_agent::pick_move(board &_board, std::vector<coord> &legal_moves)
@@ -25,6 +27,14 @@ coord human_agent::pick_move(board &_board, std::vector<coord> &legal_moves)
             continue;
         }
 
-        return {user_x, user_y};
+        coord move = {user_x, user_y};
+        if (std::find(std::begin(legal_moves), std::end(legal_moves), move) != std::end(legal_moves))
+        {
+            return {user_x, user_y};
+        }
+        else
+        {
+            std::cout << "Illegal move.\n";
+        }
     }
 }

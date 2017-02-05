@@ -14,6 +14,11 @@ struct coord
     }
 };
 
+inline bool operator==(const coord &lhs, const coord &rhs)
+{
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
 struct direction
 {
     int dx;
