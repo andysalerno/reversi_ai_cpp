@@ -14,4 +14,10 @@ struct coord
     }
 };
 
+struct direction
+{
+    int dx;
+    int dy;
+};
+
 #endif

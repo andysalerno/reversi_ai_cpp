@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "util.hpp"
+#include <cassert>
 
 int main()
 {
@@ -14,18 +15,32 @@ int main()
 void play_game(board &_board)
 {
     initialize_reversi_board(_board);
-    std::cout << _board.stringify();
 
+    std::cout << _board.stringify();
     while (!is_game_over(_board))
     {
+        // black makes a move (if it can)
         auto legal_black = legal_moves(_board, black);
         if (legal_black.size() > 0)
         {
-            auto move = vec_pick_random(legal_black);
+            coord move = vec_pick_random(legal_black);
             std::cout << move.stringify() << '\n';
-            return;
+            apply_move(_board, move, black);
         }
+        std::cout << _board.stringify();
+
+        // white makes a move (if it can)
+        auto legal_white = legal_moves(_board, white);
+        if (legal_white.size() > 0)
+        {
+            coord move = vec_pick_random(legal_white);
+            std::cout << move.stringify() << '\n';
+            apply_move(_board, move, white);
+        }
+        std::cout << _board.stringify();
     }
+
+    std::cout << "Game over!!\n";
 }
 
 std::vector<coord> legal_moves(board &_board, Piece player_color)
@@ -65,49 +80,117 @@ bool is_legal_move(coord &move, board &_board, Piece player_color)
         return false;
     }
 
-    for (int yd = -1; yd < 2; ++yd)
+    for (int dy = -1; dy < 2; ++dy)
     {
-        for (int xd = -1; xd < 2; ++xd)
+        for (int dx = -1; dx < 2; ++dx)
         {
-            if (xd == 0 && yd == 0)
+            if (dx == 0 && dy == 0)
             {
                 continue;
             }
 
-            unsigned dist = 0;
-            while (true)
+            if (is_direction_valid_move(_board, move, player_color, dx, dy))
             {
-                dist += 1;
-                unsigned xp = move.x + (dist * xd);
-                unsigned yp = move.y + (dist * yd);
-                if (!_board.is_in_bounds({xp, yp}))
-                {
-                    break;
-                }
-
-                Piece check_piece = _board.get_piece({xp, yp});
-                if (dist == 1 && check_piece != opponent(player_color))
-                {
-                    // the first closest piece MUST be an opponent, not
-                    // empty or player color. If this is not the case
-                    // then this is not a valid capture direction.
-                    break;
-                }
-                else if (dist > 1 && check_piece == opponent(player_color))
-                {
-                    continue;
-                }
-                else if (dist > 1 && check_piece == player_color)
-                {
-                    // we have found a direction where there is some
-                    // amount of opponent pieces, followed by a piece of the player's color.
-                    return true;
-                }
+                return true;
             }
         }
     }
 
     return false;
+}
+
+bool is_direction_valid_move(board &_board, coord &move, Piece player_color, int dx, int dy)
+{
+    if (dx == 0 && dy == 0)
+    {
+        return false;
+    }
+
+    unsigned dist = 0;
+    while (true)
+    {
+        dist += 1;
+        unsigned xp = move.x + (dist * dx);
+        unsigned yp = move.y + (dist * dy);
+        if (!_board.is_in_bounds({xp, yp}))
+        {
+            return false;
+        }
+
+        Piece check_piece = _board.get_piece({xp, yp});
+        if (dist == 1 && check_piece != opponent(player_color))
+        {
+            // the first closest piece MUST be an opponent, not
+            // empty or player color. If this is not the case
+            // then this is not a valid capture direction.
+            return false;
+        }
+        else if (dist > 1 && check_piece == empty)
+        {
+            // If we hit an empty piece before hitting our own color,
+            // this is not a valid direction to flip.
+            return false;
+        }
+        else if (dist > 1 && check_piece == opponent(player_color))
+        {
+            // If we hit an opponent piece, keep checking in this direction
+            continue;
+        }
+        else if (dist > 1 && check_piece == player_color)
+        {
+            // If we hit our piece, we know there is some amount of opponent
+            // pieces between our new piece and our existing piece, with no empty
+            // spaces in between, making this direction a valid flip direction.
+            return true;
+        }
+    }
+}
+
+bool apply_move(board &_board, coord &move, Piece player_color)
+{
+    std::vector<direction> directions_to_flip;
+
+    // find directions that need to be flipped
+    for (int dy = -1; dy < 2; ++dy)
+    {
+        for (int dx = -1; dx < 2; ++dx)
+        {
+            if (is_direction_valid_move(_board, move, player_color, dx, dy))
+            {
+                directions_to_flip.push_back({dx, dy});
+            }
+        }
+    }
+
+    if (directions_to_flip.size() == 0)
+    {
+        return false;
+    }
+
+    // perform the flipping
+    for (const auto &direction : directions_to_flip)
+    {
+        unsigned distance = 1;
+        while (true)
+        {
+            coord flip_coord = {move.x + (direction.dx * distance), move.y + (direction.dy * distance)};
+            Piece flip_piece = _board.get_piece(flip_coord);
+            assert(flip_piece == player_color || flip_piece == opponent(player_color));
+            if (flip_piece == opponent(player_color))
+            {
+                _board.flip_piece(flip_coord);
+            }
+            else if (flip_piece == player_color)
+            {
+                break;
+            }
+
+            ++distance;
+        }
+    }
+
+    _board.set_piece(move, player_color);
+    return true;
 }
 
 Piece opponent(Piece player)

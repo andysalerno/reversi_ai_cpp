@@ -1,4 +1,5 @@
 #include "board.hpp"
+#include <cmath>
 
 board::board(size_t size) : size(size), board_vec(size, std::vector<Piece>(size, black)), amount_black_pieces(0), amount_white_pieces(0)
 {
@@ -9,19 +10,19 @@ void board::flip_piece(coord xy)
 {
     if (this->get_piece(xy) == black)
     {
-        --(this->amount_black_pieces);
+        this->amount_black_pieces -= 1;
         this->set_piece(xy, white);
     }
     else if (this->get_piece(xy) == white)
     {
-        --(this->amount_white_pieces);
+        this->amount_white_pieces -= 1;
         this->set_piece(xy, black);
     }
 }
 
 bool board::is_full()
 {
-    return (this->get_amount_black() + this->get_amount_white() == this->get_size());
+    return (this->get_amount_black() + this->get_amount_white() == pow(this->get_size(), 2));
 }
 
 unsigned board::get_amount_black()
@@ -50,11 +51,11 @@ void board::set_piece(coord xy, Piece piece)
 
     if (piece == white)
     {
-        ++(this->amount_white_pieces);
+        this->amount_white_pieces += 1;
     }
     else if (piece == black)
     {
-        ++(this->amount_black_pieces);
+        this->amount_black_pieces += 1;
     }
 }
 
