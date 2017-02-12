@@ -1,18 +1,18 @@
 #ifndef REVERSI_H
 #define REVERSI_H
 
-#include "board.hpp"
-#include <vector>
-#include <memory>
 #include "agent.hpp"
+#include "board.hpp"
+#include <memory>
+#include <vector>
 
-void initialize_reversi_board(board &);
-void play_game(board &, std::unique_ptr<agent> &, std::unique_ptr<agent> &);
-bool is_legal_move(coord &, board &, Piece);
-std::vector<coord> legal_moves(board &, Piece);
+void initialize_reversi_board(Board&);
+void play_game(Board&, std::unique_ptr<agent>&, std::unique_ptr<agent>&);
+bool is_legal_move(coord&, Board&, Piece);
+std::vector<coord> legal_moves(Board&, Piece);
 Piece opponent(Piece);
-bool is_game_over(board &_board);
-bool apply_move(board &, coord &, Piece);
-bool is_direction_valid_move(board &_board, coord &move, Piece player_color, int dx, int dy);
+bool is_game_over(Board& _board);
+bool apply_move(Board&, coord&, Piece);
+bool is_direction_valid_move(Board& _board, coord& move, Piece player_color, int dx, int dy);
 
 #endif

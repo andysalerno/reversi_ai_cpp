@@ -1,25 +1,23 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include <vector>
-#include <string>
 #include "coord.hpp"
+#include <string>
+#include <vector>
 
-enum Piece
-{
+enum Piece {
     empty,
     black,
     white
 };
 
-class board
-{
+class Board {
     size_t size;
     unsigned amount_white_pieces, amount_black_pieces;
-    std::vector<std::vector<Piece>> board_vec;
+    std::vector<std::vector<Piece> > board_vec;
 
-  public:
-    board(size_t size);
+public:
+    Board(size_t size);
     void flip_piece(coord);
     void set_piece(coord, Piece);
     void clear();
@@ -30,35 +28,46 @@ class board
     bool is_in_bounds(coord);
     size_t get_size();
     std::string stringify();
-    inline bool operator==(const board &other);
-    const std::vector<std::vector<Piece>> &get_board_vec() const
+    inline bool operator==(const Board& other);
+    const std::vector<std::vector<Piece> >& get_board_vec() const
     {
         return this->board_vec;
     }
 };
 
-inline bool board::operator==(const board &other)
+inline bool Board::operator==(const Board& other)
 {
     return this->board_vec == other.board_vec;
 }
 
-namespace std
-{
+namespace std {
 template <>
-struct hash<std::vector<std::vector<Piece>>>
-{
-    std::size_t operator()(std::vector<std::vector<Piece>> const &board_vec) const
+struct hash<std::vector<std::vector<Piece> > > {
+    std::size_t operator()(std::vector<std::vector<Piece> > const& board_vec) const
     {
-        return 7;
+        int hashval = 5138;
+
+        for (const auto& row : board_vec) {
+            for (const auto& val : row) {
+                hashval += val;
+                hashval += (hashval << 10);
+                hashval ^= (hashval >> 6);
+            }
+        }
+
+        hashval += (hashval << 3);
+        hashval ^= (hashval >> 11);
+        hashval += (hashval << 15);
+
+        return hashval;
     }
 };
 
 template <>
-struct hash<board>
-{
-    std::size_t operator()(board const &_board) const
+struct hash<Board> {
+    std::size_t operator()(Board const& _board) const
     {
-        return std::hash<std::vector<std::vector<Piece>>>{}(_board.get_board_vec());
+        return std::hash<std::vector<std::vector<Piece> > >{}(_board.get_board_vec());
     }
 };
 }

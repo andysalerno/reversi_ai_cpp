@@ -1,15 +1,14 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#include <vector>
-#include "coord.hpp"
 #include "board.hpp"
+#include "coord.hpp"
+#include <vector>
 
-class agent
-{
-  public:
+class agent {
+public:
     virtual ~agent() {}
-    virtual coord pick_move(board &, std::vector<coord> &legal_moves) = 0;
+    virtual coord pick_move(Board&, std::vector<coord>& legal_moves) = 0;
 };
 
 #endif

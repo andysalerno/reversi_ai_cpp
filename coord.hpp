@@ -3,8 +3,7 @@
 
 #include <string>
 
-struct coord
-{
+struct coord {
     unsigned x;
     unsigned y;
 
@@ -14,13 +13,12 @@ struct coord
     }
 };
 
-inline bool operator==(const coord &lhs, const coord &rhs)
+inline bool operator==(const coord& lhs, const coord& rhs)
 {
     return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-struct direction
-{
+struct direction {
     int dx;
     int dy;
 };

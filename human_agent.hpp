@@ -2,13 +2,12 @@
 #define HUMAN_AGENT_H
 
 #include "agent.hpp"
-#include <vector>
 #include "board.hpp"
+#include <vector>
 
-class human_agent : public agent
-{
-  public:
-    coord pick_move(board &, std::vector<coord> &legal_moves);
+class human_agent : public agent {
+public:
+    coord pick_move(Board&, std::vector<coord>& legal_moves);
 };
 
 #endif
