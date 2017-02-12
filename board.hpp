@@ -12,12 +12,15 @@ enum Piece {
 };
 
 class Board {
-    size_t size;
+    size_t size = 8;
     unsigned amount_white_pieces, amount_black_pieces;
     std::vector<std::vector<Piece> > board_vec;
 
 public:
-    Board(size_t size);
+    Board();
+    Board(Board&&);
+    Board(const Board&);
+
     void flip_piece(coord);
     void set_piece(coord, Piece);
     void clear();

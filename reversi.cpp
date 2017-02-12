@@ -3,6 +3,7 @@
 #include "board.hpp"
 #include "coord.hpp"
 #include "human_agent.hpp"
+#include "monte_carlo_agent.hpp"
 #include "random_agent.hpp"
 #include "util.hpp"
 #include <cassert>
@@ -12,10 +13,10 @@
 
 int main()
 {
-    Board _board{ 8 };
+    Board _board;
 
-    auto black_agent = std::unique_ptr<agent>(new random_agent{});
-    auto white_agent = std::unique_ptr<agent>(new human_agent{});
+    auto black_agent = std::unique_ptr<agent>(new random_agent{ black });
+    auto white_agent = std::unique_ptr<agent>(new monte_carlo_agent{ white });
 
     while (true) {
         play_game(_board, black_agent, white_agent);
@@ -112,7 +113,7 @@ bool is_legal_move(coord& move, Board& _board, Piece player_color)
     return false;
 }
 
-bool is_direction_valid_move(Board& _board, coord& move, Piece player_color, int dx, int dy)
+bool is_direction_valid_move(Board& _board, const coord& move, Piece player_color, int dx, int dy)
 {
     if (dx == 0 && dy == 0) {
         return false;
@@ -149,7 +150,7 @@ bool is_direction_valid_move(Board& _board, coord& move, Piece player_color, int
     }
 }
 
-bool apply_move(Board& _board, coord& move, Piece player_color)
+bool apply_move(Board& _board, const coord& move, Piece player_color)
 {
     std::vector<direction> directions_to_flip;
 

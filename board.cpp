@@ -1,14 +1,28 @@
 #include "board.hpp"
 #include <cmath>
 #include <iostream>
+#include <utility>
 
-Board::Board(size_t size)
-    : size(size)
-    , board_vec(size, std::vector<Piece>(size, empty))
+Board::Board()
+    : board_vec(size, std::vector<Piece>(size, empty))
     , amount_black_pieces(0)
     , amount_white_pieces(0)
 {
     this->clear();
+}
+
+Board::Board(const Board& other)
+    : board_vec(other.board_vec)
+    , amount_black_pieces(other.amount_black_pieces)
+    , amount_white_pieces(other.amount_white_pieces)
+{
+}
+
+Board::Board(Board&& other)
+    : board_vec(std::move(other.board_vec))
+    , amount_black_pieces(other.amount_black_pieces)
+    , amount_white_pieces(other.amount_white_pieces)
+{
 }
 
 void Board::flip_piece(coord xy)

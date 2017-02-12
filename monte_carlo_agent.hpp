@@ -4,15 +4,21 @@
 #include "agent.hpp"
 #include "board.hpp"
 #include "coord.hpp"
+#include "tree_manager.hpp"
 #include <memory>
 #include <vector>
 
 class monte_carlo_agent : public agent {
-    coord mcts(Board& _board, std::vector<coord>& legal_moves);
+    coord mcts(GameState&&, std::vector<coord>&);
+    std::shared_ptr<Node> tree_policy(std::shared_ptr<Node>);
+    std::shared_ptr<Node> best_child(std::shared_ptr<Node>);
+    int simulate(GameState&);
+    void back_prop(Node&, int);
+    TreeManager tree_manager;
 
 public:
-    monte_carlo_agent();
-    coord pick_move(Board&, std::vector<coord>& legal_moves);
+    monte_carlo_agent(Piece);
+    coord pick_move(const Board&, std::vector<coord>& legal_moves);
 };
 
 #endif

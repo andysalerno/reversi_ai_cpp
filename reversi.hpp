@@ -12,7 +12,7 @@ bool is_legal_move(coord&, Board&, Piece);
 std::vector<coord> legal_moves(Board&, Piece);
 Piece opponent(Piece);
 bool is_game_over(Board& _board);
-bool apply_move(Board&, coord&, Piece);
-bool is_direction_valid_move(Board& _board, coord& move, Piece player_color, int dx, int dy);
+bool apply_move(Board&, const coord&, Piece);
+bool is_direction_valid_move(Board& _board, const coord& move, Piece player_color, int dx, int dy);
 
 #endif
