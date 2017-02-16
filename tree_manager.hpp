@@ -10,26 +10,27 @@
 // GameState
 struct GameState {
     Board board;
-    Piece player_turn;
     std::vector<coord> legal_moves;
+    Piece player_turn;
     inline bool operator==(const GameState&);
 
     GameState(const GameState& other)
         : board(other.board)
-        , player_turn(other.player_turn)
         , legal_moves(other.legal_moves)
+        , player_turn(other.player_turn)
     {
     }
 
     GameState(GameState&& other)
         : board(other.board)
-        , player_turn(other.player_turn)
         , legal_moves(std::move(other.legal_moves))
+        , player_turn(other.player_turn)
     {
     }
 
-    GameState(Board _board, std::vector<coord> legal_moves, Piece _player_turn)
+    GameState(const Board& _board, std::vector<coord>& legal_moves, Piece _player_turn)
         : board(_board)
+        , legal_moves(legal_moves)
         , player_turn(_player_turn)
     {
     }
@@ -54,20 +55,26 @@ struct hash<GameState> {
 
 // Node
 struct Node {
-    unsigned plays;
-    unsigned wins;
-    Node* parent;
     GameState game_state;
+    Node* parent;
+    unsigned plays, wins;
     std::vector<std::shared_ptr<Node> > children;
     std::unordered_set<coord> moves_tried;
+    coord move; // the move that led from parent to this child
 
-    Node(GameState&& _game_state, Node* _parent = nullptr)
+    Node(GameState&& _game_state, coord _move, Node* _parent)
         : game_state(std::move(_game_state))
-        , parent(_parent)
+        , parent(nullptr)
         , plays(0)
         , wins(0)
         , children(std::vector<std::shared_ptr<Node> >{})
         , moves_tried(std::unordered_set<coord>{})
+        , move(_move)
+    {
+    }
+
+    Node(GameState&& _game_state)
+        : Node(std::move(_game_state), { 0, 0 }, nullptr)
     {
     }
 
@@ -77,6 +84,16 @@ struct Node {
     }
 };
 
+namespace std {
+template <>
+struct hash<Node> {
+    std::size_t operator()(Node const& node) const
+    {
+        return std::hash<GameState>{}(node.game_state);
+    }
+};
+}
+
 // TreeManager
 class TreeManager {
     std::unordered_map<std::shared_ptr<GameState>, std::shared_ptr<Node> >
@@ -84,7 +101,7 @@ class TreeManager {
 
 public:
     TreeManager();
-    std::shared_ptr<Node> add_node(GameState&&, const coord&, Node&);
+    std::shared_ptr<Node> add_node(GameState&&, const coord&, Node*);
     std::shared_ptr<Node> add_root_node(GameState&&);
     std::shared_ptr<Node> get_node(GameState&&);
 };

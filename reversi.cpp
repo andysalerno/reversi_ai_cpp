@@ -92,6 +92,16 @@ bool is_game_over(Board& _board)
     return false;
 }
 
+Piece winner(Board& board)
+{
+    // TODO: actually make sure the game is over
+    if (board.get_amount_white() > board.get_amount_black()) {
+        return white;
+    } else {
+        return black;
+    }
+}
+
 bool is_legal_move(coord& move, Board& _board, Piece player_color)
 {
     if (!_board.is_in_bounds(move) || _board.get_piece(move) != empty) {

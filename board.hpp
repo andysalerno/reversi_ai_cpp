@@ -13,8 +13,8 @@ enum Piece {
 
 class Board {
     size_t size = 8;
-    unsigned amount_white_pieces, amount_black_pieces;
     std::vector<std::vector<Piece> > board_vec;
+    unsigned amount_black_pieces, amount_white_pieces;
 
 public:
     Board();

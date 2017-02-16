@@ -6,10 +6,10 @@ TreeManager::TreeManager()
 {
 }
 
-std::shared_ptr<Node> TreeManager::add_node(GameState&& game_state, const coord& coord, Node& parent)
+std::shared_ptr<Node> TreeManager::add_node(GameState&& game_state, const coord& coord, Node* parent)
 {
-    auto node_ptr = std::make_shared<Node>(std::move(game_state), &parent);
-    parent.add_child(node_ptr);
+    auto node_ptr = std::make_shared<Node>(std::move(game_state), coord, parent);
+    parent->add_child(node_ptr);
     return node_ptr;
 }
 

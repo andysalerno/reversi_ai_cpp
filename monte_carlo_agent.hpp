@@ -12,7 +12,7 @@ class monte_carlo_agent : public agent {
     coord mcts(GameState&&, std::vector<coord>&);
     std::shared_ptr<Node> tree_policy(std::shared_ptr<Node>);
     std::shared_ptr<Node> best_child(std::shared_ptr<Node>);
-    int simulate(GameState&);
+    int simulate(GameState);
     void back_prop(Node&, int);
     TreeManager tree_manager;
 

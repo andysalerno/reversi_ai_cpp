@@ -14,5 +14,6 @@ Piece opponent(Piece);
 bool is_game_over(Board& _board);
 bool apply_move(Board&, const coord&, Piece);
 bool is_direction_valid_move(Board& _board, const coord& move, Piece player_color, int dx, int dy);
+Piece winner(Board&);
 
 #endif
