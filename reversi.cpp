@@ -3,7 +3,6 @@
 #include "board.hpp"
 #include "coord.hpp"
 #include "human_agent.hpp"
-#include "monte_carlo_agent.hpp"
 #include "random_agent.hpp"
 #include "util.hpp"
 #include <cassert>
@@ -16,7 +15,7 @@ int main()
     Board _board;
 
     auto black_agent = std::unique_ptr<agent>(new random_agent{ black });
-    auto white_agent = std::unique_ptr<agent>(new monte_carlo_agent{ white });
+    auto white_agent = std::unique_ptr<agent>(new random_agent{ white });
 
     while (true) {
         play_game(_board, black_agent, white_agent);
