@@ -2,6 +2,7 @@
 #include "agent.hpp"
 #include "board.hpp"
 #include "coord.hpp"
+#include "gamestate.hpp"
 #include "human_agent.hpp"
 #include "random_agent.hpp"
 #include "util.hpp"
@@ -40,7 +41,8 @@ void play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_p
         // black makes a move (if it can)
         auto legal_black = legal_moves(_board, black);
         if (legal_black.size() > 0) {
-            coord move = black_agent->pick_move(_board, legal_black);
+            GameState game_state{ _board, legal_black, black };
+            coord move = black_agent->pick_move(game_state);
             std::cout << "Black plays at: " << move.stringify() << '\n';
             apply_move(_board, move, black);
         } else {
@@ -55,7 +57,8 @@ void play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_p
         // white makes a move (if it can)
         auto legal_white = legal_moves(_board, white);
         if (legal_white.size() > 0) {
-            coord move = white_agent->pick_move(_board, legal_white);
+            GameState game_state{ _board, legal_white, white };
+            coord move = white_agent->pick_move(game_state);
             std::cout << "White plays at: " << move.stringify() << '\n';
             apply_move(_board, move, white);
         } else {
@@ -67,7 +70,7 @@ void play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_p
     std::cout << "Game over!!\n";
 }
 
-std::vector<coord> legal_moves(Board& _board, Piece player_color)
+std::vector<coord> legal_moves(const Board& _board, Piece player_color)
 {
     std::vector<coord> ret;
     for (unsigned y = 0; y < _board.get_size(); ++y) {
@@ -81,7 +84,7 @@ std::vector<coord> legal_moves(Board& _board, Piece player_color)
     return ret;
 }
 
-bool is_game_over(Board& _board)
+bool is_game_over(const Board& _board)
 {
     if (_board.is_full()) {
         return true;
@@ -101,7 +104,7 @@ Piece winner(Board& board)
     }
 }
 
-bool is_legal_move(coord& move, Board& _board, Piece player_color)
+bool is_legal_move(coord& move, const Board& _board, Piece player_color)
 {
     if (!_board.is_in_bounds(move) || _board.get_piece(move) != empty) {
         return false;
@@ -122,7 +125,7 @@ bool is_legal_move(coord& move, Board& _board, Piece player_color)
     return false;
 }
 
-bool is_direction_valid_move(Board& _board, const coord& move, Piece player_color, int dx, int dy)
+bool is_direction_valid_move(const Board& _board, const coord& move, Piece player_color, int dx, int dy)
 {
     if (dx == 0 && dy == 0) {
         return false;

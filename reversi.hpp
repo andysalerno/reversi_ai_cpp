@@ -8,12 +8,12 @@
 
 void initialize_reversi_board(Board&);
 void play_game(Board&, std::unique_ptr<agent>&, std::unique_ptr<agent>&);
-bool is_legal_move(coord&, Board&, Piece);
-std::vector<coord> legal_moves(Board&, Piece);
+bool is_legal_move(coord&, const Board&, Piece);
+std::vector<coord> legal_moves(const Board&, Piece);
 Piece opponent(Piece);
-bool is_game_over(Board& _board);
+bool is_game_over(const Board& _board);
 bool apply_move(Board&, const coord&, Piece);
-bool is_direction_valid_move(Board& _board, const coord& move, Piece player_color, int dx, int dy);
+bool is_direction_valid_move(const Board& _board, const coord& move, Piece player_color, int dx, int dy);
 Piece winner(Board&);
 
 #endif

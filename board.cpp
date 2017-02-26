@@ -36,17 +36,17 @@ void Board::flip_piece(coord xy)
     }
 }
 
-bool Board::is_full()
+bool Board::is_full() const
 {
     return (this->get_amount_black() + this->get_amount_white() == pow(this->get_size(), 2));
 }
 
-unsigned Board::get_amount_black()
+unsigned Board::get_amount_black() const
 {
     return this->amount_black_pieces;
 }
 
-unsigned Board::get_amount_white()
+unsigned Board::get_amount_white() const
 {
     return this->amount_white_pieces;
 }
@@ -54,10 +54,11 @@ unsigned Board::get_amount_white()
 void Board::clear()
 {
     this->amount_black_pieces = this->amount_white_pieces = 0;
-    std::fill(this->board_vec.begin(), this->board_vec.end(), std::vector<Piece>(this->size, empty));
+    std::fill(this->board_vec.begin(), this->board_vec.end(),
+        std::vector<Piece>(this->size, empty));
 }
 
-size_t Board::get_size()
+size_t Board::get_size() const
 {
     return this->size;
 }
@@ -73,12 +74,12 @@ void Board::set_piece(coord xy, Piece piece)
     }
 }
 
-Piece Board::get_piece(coord xy)
+Piece Board::get_piece(coord xy) const
 {
     return this->board_vec[xy.y][xy.x];
 }
 
-bool Board::is_in_bounds(coord xy)
+bool Board::is_in_bounds(coord xy) const
 {
     if (xy.x < 0 || xy.y < 0) {
         return false;

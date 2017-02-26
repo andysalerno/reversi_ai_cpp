@@ -7,7 +7,7 @@
 
 class random_agent : public agent {
 public:
-    coord pick_move(const Board&, std::vector<coord>& legal_moves);
+    coord pick_move(const GameState&);
     random_agent(Piece color)
         : agent(color)
     {

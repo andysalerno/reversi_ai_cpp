@@ -24,12 +24,12 @@ public:
     void flip_piece(coord);
     void set_piece(coord, Piece);
     void clear();
-    unsigned get_amount_white();
-    unsigned get_amount_black();
-    bool is_full();
-    Piece get_piece(coord);
-    bool is_in_bounds(coord);
-    size_t get_size();
+    unsigned get_amount_white() const;
+    unsigned get_amount_black() const;
+    bool is_full() const;
+    Piece get_piece(coord) const;
+    bool is_in_bounds(coord) const;
+    size_t get_size() const;
     std::string stringify();
     inline bool operator==(const Board& other);
     const std::vector<std::vector<Piece> >& get_board_vec() const

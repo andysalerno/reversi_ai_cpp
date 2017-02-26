@@ -9,15 +9,24 @@ class TreeManager {
     std::shared_ptr<Node> root;
 
 public:
-    void add_node(GameState&& game_state, Node& parent)
+    std::shared_ptr<Node> add_node(GameState&& game_state, coord move, Node& parent)
     {
-        auto node_ptr = std::make_shared<Node>(std::move(game_state), &parent);
+        auto node_ptr = std::make_shared<Node>(std::move(game_state), move, &parent);
         parent.add_child(node_ptr);
+        return node_ptr;
     }
 
-    void add_root_node(GameState&& game_state)
+    std::shared_ptr<Node> add_root_node(GameState&& game_state)
     {
         this->root = std::make_shared<Node>(std::move(game_state));
+        return this->root;
+    }
+
+    std::shared_ptr<Node> add_root_node(const GameState& game_state)
+    {
+        GameState copy = game_state;
+        this->root = std::make_shared<Node>(std::move(copy));
+        return this->root;
     }
 };
 

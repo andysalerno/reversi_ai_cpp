@@ -1,6 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "coord.hpp"
 #include "gamestate.hpp"
 #include <memory>
 #include <vector>
@@ -10,23 +11,16 @@ class Node {
     unsigned wins;
     unsigned plays;
     Node* parent;
+    coord move;
     std::vector<std::shared_ptr<Node> > children;
 
 public:
-    Node(GameState&& _game_state)
-        : game_state(std::move(_game_state))
-        , wins(0)
-        , plays(0)
-        , parent(nullptr)
-        , children(std::vector<std::shared_ptr<Node> >{})
-    {
-    }
-
-    Node(GameState&& _game_state, Node* _parent)
+    Node(GameState&& _game_state, coord _move = { 0, 0 }, Node* _parent = nullptr)
         : game_state(std::move(_game_state))
         , wins(0)
         , plays(0)
         , parent(_parent)
+        , move(_move)
         , children(std::vector<std::shared_ptr<Node> >{})
     {
     }
@@ -49,6 +43,16 @@ public:
     Node* get_parent()
     {
         return this->parent;
+    }
+
+    const GameState& get_game_state()
+    {
+        return this->game_state;
+    }
+
+    coord get_move()
+    {
+        return this->move;
     }
 };
 
