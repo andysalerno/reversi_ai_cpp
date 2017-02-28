@@ -36,7 +36,7 @@ public:
         return this->board;
     }
 
-    Piece get_player_turn()
+    Piece get_player_turn() const
     {
         return this->player_turn;
     }

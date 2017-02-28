@@ -30,6 +30,11 @@ public:
         this->children.push_back(child);
     }
 
+    const auto& get_children()
+    {
+        return this->children;
+    }
+
     unsigned get_wins()
     {
         return this->wins;

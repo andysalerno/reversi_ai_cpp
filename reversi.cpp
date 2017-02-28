@@ -72,6 +72,7 @@ void play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_p
 
 std::vector<coord> legal_moves(const Board& _board, Piece player_color)
 {
+    // TODO: implement cache
     std::vector<coord> ret;
     for (unsigned y = 0; y < _board.get_size(); ++y) {
         for (unsigned x = 0; x < _board.get_size(); ++x) {

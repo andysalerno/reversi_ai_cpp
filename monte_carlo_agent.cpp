@@ -37,6 +37,21 @@ std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_pt
             return pass_node;
         }
     }
+    else
+    {
+        // this node has children to select from
+        // see if any children have not been played yet
+        for (const auto& child : node_ptr->get_children())
+        {
+            if (child->get_plays() == 0)
+            {
+                return child;
+            }
+        }
+
+        // there was not an unplayed child, so pick one with UCB
+        return this->best_child(node_ptr);
+    }
 }
 
 void MonteCarloAgent::back_propagate(std::shared_ptr<Node> node_ptr, int result)
@@ -49,4 +64,8 @@ int MonteCarloAgent::simulate(std::shared_ptr<Node> node_ptr)
 
 std::shared_ptr<Node> MonteCarloAgent::best_child(std::shared_ptr<Node> root_ptr)
 {
+    const bool is_enemy_turn = root_ptr->get_game_state().get_player_turn() != this->color;
+    const int C = 1; // exploration value
+    std::vector<std::pair<Node *, int>> node_scores;
+    unsigned parent_plays = root_ptr->get_plays();
 }
