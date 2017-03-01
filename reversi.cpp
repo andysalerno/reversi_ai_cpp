@@ -16,58 +16,54 @@ int main()
     Board _board;
 
     auto black_agent = std::unique_ptr<agent>(new random_agent{ black });
-    auto white_agent = std::unique_ptr<agent>(new random_agent{ white });
+    auto white_agent = std::unique_ptr<agent>(new human_agent{ white });
 
-    while (true) {
-        play_game(_board, black_agent, white_agent);
-        if (!_board.is_full()) {
-            std::cout << "board not full!\n";
-            break;
-        }
-        initialize_reversi_board(_board);
-    }
+    initialize_reversi_board(_board);
+    Piece winner = play_game(_board, black_agent, white_agent, black);
 }
 
-void play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_ptr<agent>& white_agent)
+Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_ptr<agent>& white_agent, Piece player_turn, bool silent /* default false */)
 {
-    initialize_reversi_board(_board);
+    enforce(player_turn == white || player_turn == black, "player_turn must be white or black");
+    const std::string black_name{ "Black" };
+    const std::string white_name{ "White" };
 
-    std::cout << _board.stringify();
-    while (true) {
-        if (is_game_over(_board)) {
-            break;
-        }
+    show(_board.stringify(), silent);
 
-        // black makes a move (if it can)
-        auto legal_black = legal_moves(_board, black);
-        if (legal_black.size() > 0) {
-            GameState game_state{ _board, legal_black, black };
-            coord move = black_agent->pick_move(game_state);
-            std::cout << "Black plays at: " << move.stringify() << '\n';
-            apply_move(_board, move, black);
-        } else {
-            std::cout << "Black has no moves, passes turn.\n";
-        }
-        std::cout << _board.stringify();
-
-        if (is_game_over(_board)) {
-            break;
-        }
-
-        // white makes a move (if it can)
-        auto legal_white = legal_moves(_board, white);
-        if (legal_white.size() > 0) {
-            GameState game_state{ _board, legal_white, white };
-            coord move = white_agent->pick_move(game_state);
-            std::cout << "White plays at: " << move.stringify() << '\n';
-            apply_move(_board, move, white);
-        } else {
-            std::cout << "White has no moves, passes turn.\n";
-        }
-        std::cout << _board.stringify();
+    agent* whose_turn;
+    const std::string* color_name;
+    if (player_turn == white) {
+        whose_turn = white_agent.get();
+        color_name = &white_name;
+    } else if (player_turn == black) {
+        whose_turn = black_agent.get();
+        color_name = &black_name;
     }
 
-    std::cout << "Game over!!\n";
+    while (!is_game_over(_board)) {
+        auto moves = legal_moves(_board, whose_turn->color);
+        GameState game_state{ _board, moves, whose_turn->color };
+        if (moves.size() > 0) {
+            coord move = whose_turn->pick_move(game_state);
+            show(*color_name + " plays at: " + move.stringify() + '\n', silent);
+            apply_move(_board, whose_turn->color, move);
+        } else {
+            show(*color_name + " has no moves, passes turn.\n", silent);
+        }
+        show(_board.stringify(), silent);
+
+        if (whose_turn == white_agent.get()) {
+            whose_turn = black_agent.get();
+            color_name = &black_name;
+        } else {
+            whose_turn = white_agent.get();
+            color_name = &white_name;
+        }
+    }
+
+    show("Game over!!\n", silent);
+
+    return most_pieces(_board);
 }
 
 std::vector<coord> legal_moves(const Board& _board, Piece player_color)
@@ -95,13 +91,14 @@ bool is_game_over(const Board& _board)
     return false;
 }
 
-Piece winner(Board& board)
+Piece most_pieces(const Board& board)
 {
-    // TODO: actually make sure the game is over
-    if (board.get_amount_white() > board.get_amount_black()) {
-        return white;
-    } else {
+    if (board.get_amount_white() == board.get_amount_black()) {
+        return empty; // tie returns neutral empty "color"
+    } else if (board.get_amount_black() > board.get_amount_white()) {
         return black;
+    } else {
+        return white;
     }
 }
 
@@ -163,7 +160,7 @@ bool is_direction_valid_move(const Board& _board, const coord& move, Piece playe
     }
 }
 
-bool apply_move(Board& _board, const coord& move, Piece player_color)
+bool apply_move(Board& _board, Piece player_color, const coord& move)
 {
     std::vector<direction> directions_to_flip;
 

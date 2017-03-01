@@ -4,8 +4,10 @@
 #include <string>
 #include <vector>
 
-coord human_agent::pick_move(Board& _board, std::vector<coord>& legal_moves)
+coord human_agent::pick_move(const GameState& game_state)
 {
+    const auto& board = game_state.get_board();
+    const auto& legal_moves = game_state.get_legal_moves();
     std::string user_input;
     while (true) {
         std::cout << "Enter a move x,y: ";
@@ -19,7 +21,7 @@ coord human_agent::pick_move(Board& _board, std::vector<coord>& legal_moves)
         int user_x = user_input.at(0) - '0';
         int user_y = user_input.at(2) - '0';
 
-        if (!_board.is_in_bounds({ user_x, user_y })) {
+        if (!board.is_in_bounds({ user_x, user_y })) {
             std::cout << user_x << ", " << user_y << " is not in board bounds.\n";
             continue;
         }

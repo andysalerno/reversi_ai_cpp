@@ -25,6 +25,10 @@ public:
     {
     }
 
+    Node() = delete;
+    Node(const Node&) = delete;
+    Node& operator=(const Node&) = delete;
+
     void add_child(std::shared_ptr<Node> child)
     {
         this->children.push_back(child);
@@ -43,6 +47,16 @@ public:
     unsigned get_plays()
     {
         return this->plays;
+    }
+
+    void increment_plays()
+    {
+        this->plays = this->plays + 1; // (this->plays)++ ??
+    }
+
+    void update_wins(int result)
+    {
+        this->wins = this->wins + result;
     }
 
     Node* get_parent()

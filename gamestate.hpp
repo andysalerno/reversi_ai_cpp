@@ -41,7 +41,7 @@ public:
         return this->player_turn;
     }
 
-    std::vector<coord> get_legal_moves() const
+    const auto& get_legal_moves() const
     {
         return this->legal_moves;
     }
