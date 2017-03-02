@@ -5,6 +5,7 @@
 #include "gamestate.hpp"
 #include "human_agent.hpp"
 #include "random_agent.hpp"
+#include "monte_carlo_agent.hpp"
 #include "util.hpp"
 #include <cassert>
 #include <iostream>
@@ -16,10 +17,17 @@ int main()
     Board _board;
 
     auto black_agent = std::unique_ptr<agent>(new random_agent{ black });
-    auto white_agent = std::unique_ptr<agent>(new human_agent{ white });
+    auto white_agent = std::unique_ptr<agent>(new MonteCarloAgent{ white });
 
     initialize_reversi_board(_board);
     Piece winner = play_game(_board, black_agent, white_agent, black);
+
+    std::string black_name("black");
+    std::string white_name("white");
+    std::string* winner_ptr;
+    if (winner == white) winner_ptr = &white_name;
+    else winner_ptr = &black_name;
+    std::cout << "winner: " << *winner_ptr << std::endl; 
 }
 
 Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_ptr<agent>& white_agent, Piece player_turn, bool silent /* default false */)
@@ -200,11 +208,13 @@ bool apply_move(Board& _board, Piece player_color, const coord& move)
 
 Piece opponent(Piece player)
 {
+    enforce(player == white || player == black, "opponent requires white or black");
     if (player == white) {
         return black;
     } else if (player == black) {
         return white;
     }
+    return empty;
 }
 
 void initialize_reversi_board(Board& _board)

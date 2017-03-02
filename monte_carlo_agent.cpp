@@ -16,7 +16,7 @@ coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     TreeManager tree_manager{};
     auto tree_root_ptr = tree_manager.add_root_node(game_state);
 
-    for (unsigned simulation_num = 0; simulation_num < 5000; ++simulation_num) {
+    for (unsigned simulation_num = 0; simulation_num < 1000; ++simulation_num) {
         auto selected_node_ptr = this->tree_policy(tree_root_ptr, tree_manager);
         unsigned result = this->simulate(selected_node_ptr);
         this->back_propagate(selected_node_ptr, result);
@@ -29,31 +29,39 @@ std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_pt
 {
     const GameState& game_state = node_ptr->get_game_state();
     const Board& board = game_state.get_board();
-    if (node_ptr->get_game_state().get_legal_moves().size() == 0) {
-        if (is_game_over(node_ptr->get_game_state().get_board())) {
+
+    if (game_state.get_legal_moves().size() == 0) {
+        if (is_game_over(board)) {
             // no available moves + game is over
             return node_ptr;
         } else {
             // no available moves + game is NOT over, so must pass turn
             // passing a turn acts as a "move" and gets its own node
-            const Board& pass_board = node_ptr->get_game_state().get_board();
-            auto pass_legal_moves = legal_moves(pass_board, opponent(this->color));
-            GameState pass_state{ pass_board, pass_legal_moves, opponent(this->color) };
+            auto pass_legal_moves = legal_moves(board, opponent(this->color));
+            GameState pass_state{ board, pass_legal_moves, opponent(this->color) };
             auto pass_node = tree_manager.add_node(std::move(pass_state), { 0, 0 }, *node_ptr); // TODO: move coord should not be {0, 0}
             return pass_node;
         }
     } else {
         // this node has children to select from
 
-        auto legal_moves = game_state.get_legal_moves();
-        if (legal_moves.size() > node_ptr->get_children().size()) {
+        auto legal_moves_vec = game_state.get_legal_moves();
+        if (legal_moves_vec.size() > node_ptr->get_children().size()) {
             // there are more possible child states than there are currently child nodes
             // so we must be able to create new child nodes for these states
 
             // find a move that does not have a node yet, and create a node for it
             const auto& child_nodes = node_ptr->get_children();
-            auto exists_child_with_move = [child_nodes](auto& move) { return false; };
-            for (const auto& move : legal_moves) {
+            auto exists_child_with_move = [child_nodes](auto& move) {
+                for (const auto& child : child_nodes) {
+                    if (child->get_move() == move) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            for (const auto& move : legal_moves_vec) {
                 if (!exists_child_with_move(move)) {
                     // we have found a move that does not have a node yet, so create it
                     Board next_board{ board };
@@ -61,20 +69,20 @@ std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_pt
                     apply_move(next_board, color, move);
                     auto next_moves = legal_moves(next_board, opponent(color));
                     GameState next_state{ next_board, next_moves, opponent(color) };
-                    auto next_node = tree_manager.add_node(std::move(next_state), move, node_ptr.get());
+                    auto next_node = tree_manager.add_node(std::move(next_state), move, *node_ptr);
                     return next_node;
                 }
             }
         }
 
         // there was not an unplayed child, so recurse with UCB
-        return this->tree_policy(best_child(node_ptr));
+        return this->tree_policy(best_child(node_ptr), tree_manager);
     }
 }
 
 void MonteCarloAgent::back_propagate(std::shared_ptr<Node> node_ptr, unsigned result)
 {
-    Node* parent_ptr = node_ptr->get_parent();
+    Node* parent_ptr = node_ptr.get();
     while (parent_ptr != nullptr) {
         parent_ptr->increment_plays();
         parent_ptr->update_wins(result);
@@ -112,6 +120,7 @@ std::shared_ptr<Node> MonteCarloAgent::best_child(std::shared_ptr<Node> root_ptr
     for (const auto& child_ptr : root_ptr->get_children()) {
         unsigned wins = child_ptr->get_wins();
         unsigned plays = child_ptr->get_plays();
+        enforce(plays > 0, "every child needs to have been played before calling this");
 
         if (is_enemy_turn) {
             wins = plays - wins;
