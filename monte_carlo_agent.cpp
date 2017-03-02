@@ -2,9 +2,13 @@
 #include "random_agent.hpp"
 #include "reversi.hpp"
 #include "tree_manager.hpp"
+#include <iomanip>
 #include "util.hpp"
 #include <cmath>
 #include <limits>
+#include <sstream>
+
+constexpr auto AMOUNT_SIM = 6000;
 
 coord MonteCarloAgent::pick_move(const GameState& game_state)
 {
@@ -16,13 +20,15 @@ coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     TreeManager tree_manager{};
     auto tree_root_ptr = tree_manager.add_root_node(game_state);
 
-    for (unsigned simulation_num = 0; simulation_num < 1000; ++simulation_num) {
+    for (unsigned simulation_num = 0; simulation_num < AMOUNT_SIM; ++simulation_num) {
         auto selected_node_ptr = this->tree_policy(tree_root_ptr, tree_manager);
         unsigned result = this->simulate(selected_node_ptr);
         this->back_propagate(selected_node_ptr, result);
     }
 
-    return this->best_child(tree_root_ptr)->get_move();
+    show("\n" + this->node_scores_str(tree_root_ptr->get_children()));
+    auto best_child = this->winningest_node(tree_root_ptr->get_children());
+    return best_child->get_move();
 }
 
 std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_ptr, TreeManager& tree_manager)
@@ -142,4 +148,48 @@ std::shared_ptr<Node> MonteCarloAgent::best_child(std::shared_ptr<Node> root_ptr
     }
 
     return best_node_ptr;
+}
+
+std::string MonteCarloAgent::node_scores_str(const std::vector<std::shared_ptr<Node> >& nodes) const
+{
+    std::vector<std::shared_ptr<Node>> sorted{nodes};
+    std::sort(sorted.begin(), sorted.end(),
+    [](const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b)
+    {
+        return a->get_plays() < b->get_plays();
+    });
+
+    std::stringstream stream{};
+
+    for (const auto& node_ptr : sorted) {
+        const auto wins = node_ptr->get_wins();
+        const auto plays = node_ptr->get_plays();
+        const auto move = node_ptr->get_move();
+
+        const double percent_win = 100 * wins / (double)plays;
+
+        stream << move.stringify() << ": wins/plays " << wins << "/" << plays << "(" << std::setprecision(2) << percent_win << "%)" << std::endl;
+    }
+
+    return stream.str();
+}
+
+std::shared_ptr<Node> MonteCarloAgent::winningest_node(const std::vector<std::shared_ptr<Node> >& nodes) const
+{
+    std::shared_ptr<Node> best_node;
+    unsigned most_plays = 0;
+    unsigned most_wins_tiebreaker = 0;
+
+    for (const auto& node : nodes) {
+        unsigned plays = node->get_plays();
+        unsigned wins = node->get_wins();
+        if (plays > most_plays ||
+                (plays == most_plays && wins > most_wins_tiebreaker)) {
+            most_plays = plays;
+            most_wins_tiebreaker = wins;
+            best_node = node;
+        }
+    }
+
+    return best_node;
 }

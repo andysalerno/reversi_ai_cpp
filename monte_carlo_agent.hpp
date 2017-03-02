@@ -13,6 +13,8 @@ private:
     void back_propagate(std::shared_ptr<Node>, unsigned result);
     unsigned simulate(std::shared_ptr<Node>);
     std::shared_ptr<Node> best_child(std::shared_ptr<Node> root_ptr);
+    std::string node_scores_str(const std::vector<std::shared_ptr<Node> >&) const;
+    std::shared_ptr<Node> winningest_node(const std::vector<std::shared_ptr<Node> >&) const;
 
 public:
     coord pick_move(const GameState&);
