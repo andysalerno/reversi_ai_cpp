@@ -2,9 +2,10 @@
 #include "random_agent.hpp"
 #include "reversi.hpp"
 #include "tree_manager.hpp"
-#include <iomanip>
 #include "util.hpp"
+#include <chrono>
 #include <cmath>
+#include <iomanip>
 #include <limits>
 #include <sstream>
 
@@ -20,13 +21,19 @@ coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     TreeManager tree_manager{};
     auto tree_root_ptr = tree_manager.add_root_node(game_state);
 
-    for (unsigned simulation_num = 0; simulation_num < AMOUNT_SIM; ++simulation_num) {
+    auto get_now = []() { return std::chrono::system_clock::now(); };
+    auto start_time = get_now();
+
+    unsigned simulations = 0;
+    while (get_now() - start_time < std::chrono::seconds{ 5 }) {
         auto selected_node_ptr = this->tree_policy(tree_root_ptr, tree_manager);
         unsigned result = this->simulate(selected_node_ptr);
         this->back_propagate(selected_node_ptr, result);
+        ++simulations;
     }
 
     show("\n" + this->node_scores_str(tree_root_ptr->get_children()));
+    show(std::to_string(simulations) + " simulations performed.\n");
     auto best_child = this->winningest_node(tree_root_ptr->get_children());
     return best_child->get_move();
 }
@@ -152,12 +159,11 @@ std::shared_ptr<Node> MonteCarloAgent::best_child(std::shared_ptr<Node> root_ptr
 
 std::string MonteCarloAgent::node_scores_str(const std::vector<std::shared_ptr<Node> >& nodes) const
 {
-    std::vector<std::shared_ptr<Node>> sorted{nodes};
+    std::vector<std::shared_ptr<Node> > sorted{ nodes };
     std::sort(sorted.begin(), sorted.end(),
-    [](const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b)
-    {
-        return a->get_plays() < b->get_plays();
-    });
+        [](const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b) {
+            return a->get_plays() < b->get_plays();
+        });
 
     std::stringstream stream{};
 
@@ -183,8 +189,7 @@ std::shared_ptr<Node> MonteCarloAgent::winningest_node(const std::vector<std::sh
     for (const auto& node : nodes) {
         unsigned plays = node->get_plays();
         unsigned wins = node->get_wins();
-        if (plays > most_plays ||
-                (plays == most_plays && wins > most_wins_tiebreaker)) {
+        if (plays > most_plays || (plays == most_plays && wins > most_wins_tiebreaker)) {
             most_plays = plays;
             most_wins_tiebreaker = wins;
             best_node = node;
