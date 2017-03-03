@@ -4,9 +4,11 @@
 #include "gamestate.hpp"
 #include "node.hpp"
 #include <memory>
+#include <unordered_map>
 
 class TreeManager {
     std::shared_ptr<Node> root;
+    std::unordered_map<GameState*, Node*> state_to_node{};
 
 public:
     std::shared_ptr<Node> add_node(GameState&& game_state, coord move, Node& parent)

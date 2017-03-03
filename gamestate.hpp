@@ -3,6 +3,7 @@
 
 #include "board.hpp"
 #include <vector>
+#include <boost/functional/hash.hpp>
 
 class GameState {
     Board board;
@@ -44,6 +45,15 @@ public:
     const auto& get_legal_moves() const
     {
         return this->legal_moves;
+    }
+};
+
+struct GameStateHasher
+{
+    std::size_t operator(const GameState& a, const GameState& b) const
+    {
+
+
     }
 };
 

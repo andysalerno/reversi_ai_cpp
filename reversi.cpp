@@ -16,7 +16,7 @@ int main()
 {
     Board _board;
 
-    auto black_agent = std::unique_ptr<agent>(new random_agent{ black });
+    auto black_agent = std::unique_ptr<agent>(new MonteCarloAgent{ black });
     auto white_agent = std::unique_ptr<agent>(new MonteCarloAgent{ white });
 
     initialize_reversi_board(_board);
