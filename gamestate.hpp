@@ -24,10 +24,17 @@ public:
     {
     }
 
-    GameState(Board _board, std::vector<coord> _legal_moves, Piece _player_turn)
+    GameState(const Board& _board, const std::vector<coord>& _legal_moves, Piece _player_turn)
         : board(_board)
         , player_turn(_player_turn)
         , legal_moves(_legal_moves)
+    {
+    }
+
+    GameState(const Board& _board, std::vector<coord>&& _legal_moves, Piece _player_turn)
+        : board(_board)
+        , player_turn(_player_turn)
+        , legal_moves(std::move(_legal_moves))
     {
     }
 

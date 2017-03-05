@@ -4,8 +4,8 @@
 #include "coord.hpp"
 #include "gamestate.hpp"
 #include "human_agent.hpp"
-#include "random_agent.hpp"
 #include "monte_carlo_agent.hpp"
+#include "random_agent.hpp"
 #include "util.hpp"
 #include <cassert>
 #include <iostream>
@@ -25,9 +25,11 @@ int main()
     std::string black_name("black");
     std::string white_name("white");
     std::string* winner_ptr;
-    if (winner == white) winner_ptr = &white_name;
-    else winner_ptr = &black_name;
-    std::cout << "winner: " << *winner_ptr << std::endl; 
+    if (winner == white)
+        winner_ptr = &white_name;
+    else
+        winner_ptr = &black_name;
+    std::cout << "winner: " << *winner_ptr << std::endl;
 }
 
 Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_ptr<agent>& white_agent, Piece player_turn, bool silent /* default false */)
@@ -46,6 +48,10 @@ Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_
     } else if (player_turn == black) {
         whose_turn = black_agent.get();
         color_name = &black_name;
+    } else {
+        enforce(false, "player_turn was not white or black");
+        color_name = nullptr;
+        whose_turn = nullptr;
     }
 
     while (!is_game_over(_board)) {

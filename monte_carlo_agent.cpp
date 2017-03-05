@@ -9,7 +9,7 @@
 #include <limits>
 #include <sstream>
 
-constexpr auto AMOUNT_SIM = 6000;
+constexpr auto SIM_TIME_SEC = 5;
 
 coord MonteCarloAgent::pick_move(const GameState& game_state)
 {
@@ -25,7 +25,7 @@ coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     auto start_time = get_now();
 
     unsigned simulations = 0;
-    while (get_now() - start_time < std::chrono::seconds{ 5 }) {
+    while (get_now() - start_time < std::chrono::seconds{ SIM_TIME_SEC }) {
         auto selected_node_ptr = this->tree_policy(tree_root_ptr, tree_manager);
         unsigned result = this->simulate(selected_node_ptr);
         this->back_propagate(selected_node_ptr, result);
@@ -58,14 +58,14 @@ std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_pt
     } else {
         // this node has children to select from
 
-        auto legal_moves_vec = game_state.get_legal_moves();
+        const auto& legal_moves_vec = game_state.get_legal_moves();
         if (legal_moves_vec.size() > node_ptr->get_children().size()) {
             // there are more possible child states than there are currently child nodes
             // so we must be able to create new child nodes for these states
 
             // find a move that does not have a node yet, and create a node for it
             const auto& child_nodes = node_ptr->get_children();
-            auto exists_child_with_move = [child_nodes](auto& move) {
+            auto exists_child_with_move = [child_nodes](auto& move) { // this should be looked up in an unordered_set
                 for (const auto& child : child_nodes) {
                     if (child->get_move() == move) {
                         return true;
@@ -81,7 +81,7 @@ std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_pt
                     Piece color = game_state.get_player_turn();
                     apply_move(next_board, color, move);
                     auto next_moves = legal_moves(next_board, opponent(color));
-                    GameState next_state{ next_board, next_moves, opponent(color) };
+                    GameState next_state{ next_board, std::move(next_moves), opponent(color) };
                     auto next_node = tree_manager.add_node(std::move(next_state), move, *node_ptr);
                     return next_node;
                 }
@@ -114,7 +114,7 @@ unsigned MonteCarloAgent::simulate(std::shared_ptr<Node> node_ptr)
     auto random_agent_black = std::unique_ptr<agent>(new random_agent{ black });
     auto random_agent_white = std::unique_ptr<agent>(new random_agent{ white });
 
-    Piece winner = play_game(board_copy, random_agent_black, random_agent_white, node_ptr->get_game_state().get_player_turn(), true);
+    Piece winner = play_game(board_copy, random_agent_black, random_agent_white, node_ptr->get_game_state().get_player_turn(), true); // this is where the slowdown is
 
     if (winner == this->color) {
         return WIN_RESULT;
