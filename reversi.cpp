@@ -10,7 +10,10 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
 #include <vector>
+
+//static std::unordered_map<std::pair<Board, Piece>, std::vector<coord> > cache{};
 
 int main()
 {

@@ -38,7 +38,7 @@ coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     return best_child->get_move();
 }
 
-std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_ptr, TreeManager& tree_manager)
+std::shared_ptr<ReversiNode> MonteCarloAgent::tree_policy(std::shared_ptr<ReversiNode> node_ptr, TreeManager& tree_manager)
 {
     const GameState& game_state = node_ptr->get_game_state();
     const Board& board = game_state.get_board();
@@ -93,9 +93,9 @@ std::shared_ptr<Node> MonteCarloAgent::tree_policy(std::shared_ptr<Node> node_pt
     }
 }
 
-void MonteCarloAgent::back_propagate(std::shared_ptr<Node> node_ptr, unsigned result)
+void MonteCarloAgent::back_propagate(std::shared_ptr<ReversiNode> node_ptr, unsigned result)
 {
-    Node* parent_ptr = node_ptr.get();
+    ReversiNode* parent_ptr = node_ptr.get();
     while (parent_ptr != nullptr) {
         parent_ptr->increment_plays();
         parent_ptr->update_wins(result);
@@ -104,7 +104,7 @@ void MonteCarloAgent::back_propagate(std::shared_ptr<Node> node_ptr, unsigned re
     }
 }
 
-unsigned MonteCarloAgent::simulate(std::shared_ptr<Node> node_ptr)
+unsigned MonteCarloAgent::simulate(std::shared_ptr<ReversiNode> node_ptr)
 {
     const unsigned WIN_RESULT = 1;
     const unsigned LOSS_RESULT = 0;
@@ -123,11 +123,11 @@ unsigned MonteCarloAgent::simulate(std::shared_ptr<Node> node_ptr)
     }
 }
 
-std::shared_ptr<Node> MonteCarloAgent::best_child(std::shared_ptr<Node> root_ptr)
+std::shared_ptr<ReversiNode> MonteCarloAgent::best_child(std::shared_ptr<ReversiNode> root_ptr)
 {
     const bool is_enemy_turn = root_ptr->get_game_state().get_player_turn() != this->color;
     const double C = 1; // exploration value
-    std::vector<std::pair<std::shared_ptr<Node>, double> > node_scores;
+    std::vector<std::pair<std::shared_ptr<ReversiNode>, double> > node_scores;
     unsigned parent_plays = root_ptr->get_plays();
 
     for (const auto& child_ptr : root_ptr->get_children()) {
@@ -145,23 +145,23 @@ std::shared_ptr<Node> MonteCarloAgent::best_child(std::shared_ptr<Node> root_ptr
     }
 
     double best_score = std::numeric_limits<double>::lowest();
-    std::shared_ptr<Node> best_node_ptr;
+    std::shared_ptr<ReversiNode> best_node_ptr;
     for (const auto& child_score_pair : node_scores) {
         double score = std::get<double>(child_score_pair);
         if (score > best_score) {
             best_score = score;
-            best_node_ptr = std::get<std::shared_ptr<Node> >(child_score_pair);
+            best_node_ptr = std::get<std::shared_ptr<ReversiNode> >(child_score_pair);
         }
     }
 
     return best_node_ptr;
 }
 
-std::string MonteCarloAgent::node_scores_str(const std::vector<std::shared_ptr<Node> >& nodes) const
+std::string MonteCarloAgent::node_scores_str(const std::vector<std::shared_ptr<ReversiNode> >& nodes) const
 {
-    std::vector<std::shared_ptr<Node> > sorted{ nodes };
+    std::vector<std::shared_ptr<ReversiNode> > sorted{ nodes };
     std::sort(sorted.begin(), sorted.end(),
-        [](const std::shared_ptr<Node>& a, const std::shared_ptr<Node>& b) {
+        [](const std::shared_ptr<ReversiNode>& a, const std::shared_ptr<ReversiNode>& b) {
             return a->get_plays() < b->get_plays();
         });
 
@@ -180,9 +180,9 @@ std::string MonteCarloAgent::node_scores_str(const std::vector<std::shared_ptr<N
     return stream.str();
 }
 
-std::shared_ptr<Node> MonteCarloAgent::winningest_node(const std::vector<std::shared_ptr<Node> >& nodes) const
+std::shared_ptr<ReversiNode> MonteCarloAgent::winningest_node(const std::vector<std::shared_ptr<ReversiNode> >& nodes) const
 {
-    std::shared_ptr<Node> best_node;
+    std::shared_ptr<ReversiNode> best_node;
     unsigned most_plays = 0;
     unsigned most_wins_tiebreaker = 0;
 
