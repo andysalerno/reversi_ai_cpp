@@ -1,8 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <boost/random.hpp>
-#include <boost/random/random_device.hpp>
 #include <cassert>
 #include <iostream>
 #include <random>
@@ -12,8 +10,8 @@
 template <typename T>
 T vec_pick_random(const std::vector<T>& vec)
 {
-    boost::random_device rand;
-    boost::mt19937 engine{ rand() };
+    std::random_device rd;
+    std::mt19937 engine{ rd() };
     std::uniform_int_distribution<int> index(0, vec.size() - 1);
     return vec[index(engine)];
 }

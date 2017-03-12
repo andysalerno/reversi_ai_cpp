@@ -18,8 +18,8 @@ coord human_agent::pick_move(const GameState& game_state)
             continue;
         }
 
-        int user_x = user_input.at(0) - '0';
-        int user_y = user_input.at(2) - '0';
+        const unsigned user_x = user_input.at(0) - '0';
+        const unsigned user_y = user_input.at(2) - '0';
 
         if (!board.is_in_bounds({ user_x, user_y })) {
             std::cout << user_x << ", " << user_y << " is not in board bounds.\n";

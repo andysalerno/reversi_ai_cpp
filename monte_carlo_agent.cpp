@@ -3,6 +3,7 @@
 #include "reversi.hpp"
 #include "tree_manager.hpp"
 #include "util.hpp"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <iomanip>
