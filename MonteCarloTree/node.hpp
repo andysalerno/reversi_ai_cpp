@@ -1,27 +1,27 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "coord.hpp"
-#include "gamestate.hpp"
 #include <memory>
 #include <vector>
 
+template <typename S, typename A>
 class Node {
-    GameState game_state;
-    unsigned wins;
     unsigned plays;
-    Node* parent;
-    coord move;
-    std::vector<std::shared_ptr<Node> > children;
+    unsigned wins;
+    S game_state;
+    A action;
+
+    Node<S, A>* parent;
+    std::vector<std::shared_ptr<Node<S, A>>> children;
 
 public:
-    Node(GameState&& _game_state, coord _move = { 0, 0 }, Node* _parent = nullptr)
-        : game_state(std::move(_game_state))
+    Node(S&& _game_state, A _action = { 0, 0 }, Node* _parent = nullptr)
+        : plays(0)
         , wins(0)
-        , plays(0)
+        , game_state(std::move(_game_state))
+        , action(_action)
         , parent(_parent)
-        , move(_move)
-        , children(std::vector<std::shared_ptr<Node> >{})
+        , children(std::vector<std::shared_ptr<Node<S, A>>>{})
     {
     }
 
@@ -29,22 +29,22 @@ public:
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
-    void add_child(std::shared_ptr<Node> child)
+    void add_child(std::shared_ptr<Node<S, A>> child)
     {
         this->children.push_back(child);
     }
 
-    const auto& get_children()
+    const auto& get_children() const
     {
         return this->children;
     }
 
-    unsigned get_wins()
+    unsigned get_wins() const
     {
         return this->wins;
     }
 
-    unsigned get_plays()
+    unsigned get_plays() const
     {
         return this->plays;
     }
@@ -59,19 +59,19 @@ public:
         this->wins = this->wins + result;
     }
 
-    Node* get_parent()
+    Node<S, A>* get_parent() const
     {
         return this->parent;
     }
 
-    const GameState& get_game_state()
+    const S& get_game_state() const
     {
         return this->game_state;
     }
 
-    coord get_move()
+    A get_move() const
     {
-        return this->move;
+        return this->action;
     }
 };
 

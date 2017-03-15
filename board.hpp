@@ -13,7 +13,7 @@ enum Piece {
 
 class Board {
     size_t size = 8;
-    std::vector<std::vector<Piece> > board_vec;
+    std::vector<std::vector<Piece>> board_vec;
     unsigned amount_black_pieces, amount_white_pieces;
 
 public:
@@ -31,22 +31,23 @@ public:
     bool is_in_bounds(coord) const;
     size_t get_size() const;
     std::string stringify();
-    inline bool operator==(const Board& other);
-    const std::vector<std::vector<Piece> >& get_board_vec() const
+    inline bool operator==(const Board& other) const;
+    Board& operator=(const Board& other) = default;
+    const std::vector<std::vector<Piece>>& get_board_vec() const
     {
         return this->board_vec;
     }
 };
 
-inline bool Board::operator==(const Board& other)
+inline bool Board::operator==(const Board& other) const
 {
     return this->board_vec == other.board_vec;
 }
 
 namespace std {
 template <>
-struct hash<std::vector<std::vector<Piece> > > {
-    std::size_t operator()(std::vector<std::vector<Piece> > const& board_vec) const
+struct hash<std::vector<std::vector<Piece>>> {
+    std::size_t operator()(std::vector<std::vector<Piece>> const& board_vec) const
     {
         int hashval = 5138;
 
@@ -68,9 +69,9 @@ struct hash<std::vector<std::vector<Piece> > > {
 
 template <>
 struct hash<Board> {
-    std::size_t operator()(Board const& _board) const
+    std::size_t operator()(const Board& _board) const
     {
-        return std::hash<std::vector<std::vector<Piece> > >{}(_board.get_board_vec());
+        return std::hash<std::vector<std::vector<Piece>>>{}(_board.get_board_vec());
     }
 };
 }

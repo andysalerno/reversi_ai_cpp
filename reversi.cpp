@@ -8,18 +8,20 @@
 #include "random_agent.hpp"
 #include "util.hpp"
 #include <cassert>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
-//static std::unordered_map<std::pair<Board, Piece>, std::vector<coord> > cache{};
+static std::unordered_map<Board, std::vector<coord>> legal_cache_white;
+static std::unordered_map<Board, std::vector<coord>> legal_cache_black;
 
 int main()
 {
     Board _board;
 
-    auto black_agent = std::unique_ptr<agent>(new random_agent{ black });
+    auto black_agent = std::unique_ptr<agent>(new MonteCarloAgent{ black });
     auto white_agent = std::unique_ptr<agent>(new MonteCarloAgent{ white });
 
     initialize_reversi_board(_board);
@@ -85,7 +87,25 @@ Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_
 
 std::vector<coord> legal_moves(const Board& _board, Piece player_color)
 {
-    // TODO: implement cache
+    decltype(&legal_cache_black) cache_ptr;
+    if (player_color == black) {
+        cache_ptr = &legal_cache_black;
+    } else if (player_color == white) {
+        cache_ptr = &legal_cache_white;
+    } else {
+        enforce(false, "player_color was neither black nor white");
+    }
+
+    auto cache_result = cache_ptr->find(_board);
+    if (cache_result != cache_ptr->end()) {
+        return cache_result->second;
+    }
+
+    // std::vector<coord> cached_moves{};
+    // if (legal_cache.try_query_cache(_board, cached_moves)) {
+    //     return cached_moves;
+    // }
+
     std::vector<coord> ret;
     for (unsigned y = 0; y < _board.get_size(); ++y) {
         for (unsigned x = 0; x < _board.get_size(); ++x) {
@@ -95,6 +115,9 @@ std::vector<coord> legal_moves(const Board& _board, Piece player_color)
             }
         }
     }
+
+    cache_ptr->insert({ _board, ret });
+    //legal_cache.insert(_board, ret);
     return ret;
 }
 
