@@ -21,7 +21,12 @@ coord MonteCarloAgent::pick_move(const GameState& game_state)
 
 coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
 {
-    auto tree_root_ptr = this->reversi_tree.add_root_node(game_state);
+    auto tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
+
+    if (tree_root_ptr.get() == nullptr)
+    {
+        tree_root_ptr = this->reversi_tree.add_root_node(game_state);
+    }
 
     auto get_now = []() { return std::chrono::system_clock::now(); };
     auto start_time = get_now();
