@@ -39,8 +39,19 @@ coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
         ++simulations;
     }
 
+    unsigned effective_simulations = 0;
+    for (const auto& child : tree_root_ptr->get_children())
+    {
+        effective_simulations += child->get_plays();
+    }
+
     show("\n" + this->node_scores_str(tree_root_ptr->get_children()));
-    show(std::to_string(simulations) + " simulations performed.\n");
+    show(std::to_string(simulations) +
+        " simulations performed. (effective: " +
+        std::to_string(effective_simulations) +
+        " +" +
+        std::to_string(effective_simulations - simulations) +
+        ")\n");
     auto best_child = this->winningest_node(tree_root_ptr->get_children());
     return best_child->get_move();
 }
