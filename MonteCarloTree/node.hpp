@@ -1,6 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "../util.hpp"
 #include <memory>
 #include <vector>
 
@@ -12,7 +13,7 @@ class Node {
     A action;
 
     Node<S, A>* parent;
-    std::vector<std::shared_ptr<Node<S, A>>> children;
+    std::vector<std::shared_ptr<Node<S, A> > > children;
 
 public:
     Node(S&& _game_state, A _action = { 0, 0 }, Node* _parent = nullptr)
@@ -21,7 +22,7 @@ public:
         , game_state(std::move(_game_state))
         , action(_action)
         , parent(_parent)
-        , children(std::vector<std::shared_ptr<Node<S, A>>>{})
+        , children(std::vector<std::shared_ptr<Node<S, A> > >{})
     {
     }
 
@@ -29,7 +30,7 @@ public:
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
-    void add_child(std::shared_ptr<Node<S, A>> child)
+    void add_child(std::shared_ptr<Node<S, A> > child)
     {
         this->children.push_back(child);
     }

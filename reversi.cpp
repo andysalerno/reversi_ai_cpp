@@ -14,8 +14,8 @@
 #include <unordered_map>
 #include <vector>
 
-static std::unordered_map<Board, std::vector<coord>> legal_cache_white;
-static std::unordered_map<Board, std::vector<coord>> legal_cache_black;
+static std::unordered_map<Board, std::vector<coord> > legal_cache_white;
+static std::unordered_map<Board, std::vector<coord> > legal_cache_black;
 
 int main()
 {
