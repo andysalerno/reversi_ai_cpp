@@ -6,13 +6,13 @@
 #include "gamestate.hpp"
 #include <vector>
 
-class agent {
+class Agent {
 public:
     Piece color;
-    virtual ~agent() {}
-    virtual coord pick_move(const GameState&) = 0;
+    virtual ~Agent() {}
+    virtual Coord pick_move(const GameState&) = 0;
 
-    agent(Piece _color)
+    Agent(Piece _color)
         : color(_color)
     {
     }

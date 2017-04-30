@@ -3,30 +3,23 @@
 
 #include "board.hpp"
 #include <functional>
+#include <iostream>
 #include <vector>
 
 class GameState {
     Board board;
     Piece player_turn;
-    std::vector<coord> legal_moves;
+    std::vector<Coord> legal_moves;
 
 public:
-    GameState(const GameState&) = default;
-    GameState(GameState&& other)
-        : board(std::move(other.board))
-        , player_turn(other.player_turn)
-        , legal_moves(std::move(other.legal_moves))
-    {
-    }
-
-    GameState(const Board& _board, const std::vector<coord>& _legal_moves, Piece _player_turn)
+    GameState(const Board& _board, const std::vector<Coord>& _legal_moves, Piece _player_turn)
         : board(_board)
         , player_turn(_player_turn)
         , legal_moves(_legal_moves)
     {
     }
 
-    GameState(const Board& _board, std::vector<coord>&& _legal_moves, Piece _player_turn)
+    GameState(const Board& _board, std::vector<Coord>&& _legal_moves, Piece _player_turn)
         : board(_board)
         , player_turn(_player_turn)
         , legal_moves(std::move(_legal_moves))
@@ -51,7 +44,7 @@ public:
 
 namespace std {
 template <>
-struct hash<std::reference_wrapper<const GameState>> {
+struct hash<std::reference_wrapper<const GameState> > {
     std::size_t operator()(std::reference_wrapper<const GameState> const& game_state_ref) const
     {
         const GameState& game_state = game_state_ref.get();

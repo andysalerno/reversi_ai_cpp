@@ -5,11 +5,11 @@
 #include "board.hpp"
 #include "coord.hpp"
 
-class random_agent : public agent {
+class random_agent : public Agent {
 public:
-    coord pick_move(const GameState&);
+    Coord pick_move(const GameState&);
     random_agent(Piece color)
-        : agent(color)
+        : Agent(color)
     {
     }
 };

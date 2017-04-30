@@ -6,24 +6,24 @@
 #include "board.hpp"
 #include "coord.hpp"
 
-using ReversiNode = Node<GameState, coord>;
-using ReversiTree = MonteCarloTree<GameState, coord>;
+using ReversiNode = Node<GameState, Coord>;
+using ReversiTree = MonteCarloTree<GameState, Coord>;
 
-class MonteCarloAgent : public agent {
+class MonteCarloAgent : public Agent {
 private:
     ReversiTree reversi_tree;
-    coord monte_carlo_tree_search(const GameState&);
-    std::shared_ptr<ReversiNode> tree_policy(std::shared_ptr<ReversiNode> root);
-    void back_propagate(std::shared_ptr<ReversiNode>, unsigned result);
-    unsigned simulate(std::shared_ptr<ReversiNode>);
-    std::shared_ptr<ReversiNode> best_child(std::shared_ptr<ReversiNode> root_ptr);
-    std::string node_scores_str(const std::vector<std::shared_ptr<ReversiNode>>&) const;
-    std::shared_ptr<ReversiNode> winningest_node(const std::vector<std::shared_ptr<ReversiNode>>&) const;
+    Coord monte_carlo_tree_search(const GameState&);
+    ReversiNode& tree_policy(ReversiNode& root);
+    void back_propagate(ReversiNode&, unsigned result);
+    unsigned simulate(ReversiNode&);
+    ReversiNode& best_child(ReversiNode&);
+    std::string node_scores_str(const std::vector<std::shared_ptr<ReversiNode> >&) const;
+    ReversiNode& winningest_node(const std::vector<std::shared_ptr<ReversiNode> >&) const;
 
 public:
-    coord pick_move(const GameState&);
+    Coord pick_move(const GameState&);
     MonteCarloAgent(Piece _color)
-        : agent(_color)
+        : Agent(_color)
     {
     }
 };

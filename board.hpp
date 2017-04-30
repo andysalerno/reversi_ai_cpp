@@ -2,6 +2,7 @@
 #define BOARD_HPP
 
 #include "coord.hpp"
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -12,28 +13,30 @@ enum Piece {
 };
 
 class Board {
+    using PieceVec = std::vector<std::vector<Piece> >;
     size_t size = 8;
-    std::vector<std::vector<Piece>> board_vec;
-    unsigned amount_black_pieces, amount_white_pieces;
+    PieceVec board_vec = PieceVec{ size, std::vector<Piece>(size, empty) };
+    unsigned amount_black_pieces;
+    unsigned amount_white_pieces = 0;
 
 public:
     Board();
-    Board(Board&&);
-    Board(const Board&);
+    Board(const Board&) = default;
+    Board(Board&&) = default;
+    Board& operator=(const Board& other) = default;
+    inline bool operator==(const Board& other) const;
 
-    void flip_piece(coord);
-    void set_piece(coord, Piece);
+    void flip_piece(Coord);
+    void set_piece(Coord, Piece);
     void clear();
+    bool is_full() const;
+    bool is_in_bounds(Coord) const;
     unsigned get_amount_white() const;
     unsigned get_amount_black() const;
-    bool is_full() const;
-    Piece get_piece(coord) const;
-    bool is_in_bounds(coord) const;
+    Piece get_piece(Coord) const;
     size_t get_size() const;
     std::string stringify();
-    inline bool operator==(const Board& other) const;
-    Board& operator=(const Board& other) = default;
-    const std::vector<std::vector<Piece>>& get_board_vec() const
+    const PieceVec& get_board_vec() const
     {
         return this->board_vec;
     }
@@ -46,10 +49,10 @@ inline bool Board::operator==(const Board& other) const
 
 namespace std {
 template <>
-struct hash<std::vector<std::vector<Piece>>> {
-    std::size_t operator()(std::vector<std::vector<Piece>> const& board_vec) const
+struct hash<std::vector<std::vector<Piece> > > {
+    std::size_t operator()(std::vector<std::vector<Piece> > const& board_vec) const
     {
-        int hashval = 5138;
+        size_t hashval = 5138;
 
         for (const auto& row : board_vec) {
             for (const auto& val : row) {
@@ -71,7 +74,7 @@ template <>
 struct hash<Board> {
     std::size_t operator()(const Board& _board) const
     {
-        return std::hash<std::vector<std::vector<Piece>>>{}(_board.get_board_vec());
+        return std::hash<std::vector<std::vector<Piece> > >{}(_board.get_board_vec());
     }
 };
 }

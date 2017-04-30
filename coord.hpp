@@ -3,9 +3,9 @@
 
 #include <string>
 
-struct coord {
-    unsigned x;
-    unsigned y;
+struct Coord {
+    unsigned x = 0;
+    unsigned y = 0;
 
     std::string stringify() const
     {
@@ -13,17 +13,17 @@ struct coord {
     }
 };
 
-inline bool operator==(const coord& lhs, const coord& rhs)
+inline bool operator==(const Coord& lhs, const Coord& rhs)
 {
     return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
 namespace std {
 template <>
-struct hash<coord> {
-    std::size_t operator()(coord const& _coord) const
+struct hash<Coord> {
+    std::size_t operator()(Coord const& coord) const
     {
-        return (_coord.x * 127) + _coord.y;
+        return (coord.x * 127) + coord.y;
     }
 };
 }

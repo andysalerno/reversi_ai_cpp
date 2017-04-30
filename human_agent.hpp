@@ -5,11 +5,11 @@
 #include "board.hpp"
 #include <vector>
 
-class human_agent : public agent {
+class human_agent : public Agent {
 public:
-    coord pick_move(const GameState&);
+    Coord pick_move(const GameState&);
     human_agent(Piece color)
-        : agent(color)
+        : Agent(color)
     {
     }
 };

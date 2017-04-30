@@ -4,28 +4,11 @@
 #include <utility>
 
 Board::Board()
-    : board_vec(size, std::vector<Piece>(size, empty))
-    , amount_black_pieces(0)
-    , amount_white_pieces(0)
 {
     this->clear();
 }
 
-Board::Board(const Board& other)
-    : board_vec(other.board_vec)
-    , amount_black_pieces(other.amount_black_pieces)
-    , amount_white_pieces(other.amount_white_pieces)
-{
-}
-
-Board::Board(Board&& other)
-    : board_vec(std::move(other.board_vec))
-    , amount_black_pieces(other.amount_black_pieces)
-    , amount_white_pieces(other.amount_white_pieces)
-{
-}
-
-void Board::flip_piece(coord xy)
+void Board::flip_piece(Coord xy)
 {
     if (this->get_piece(xy) == black) {
         this->amount_black_pieces -= 1;
@@ -63,7 +46,7 @@ size_t Board::get_size() const
     return this->size;
 }
 
-void Board::set_piece(coord xy, Piece piece)
+void Board::set_piece(Coord xy, Piece piece)
 {
     this->board_vec[xy.y][xy.x] = piece;
 
@@ -74,12 +57,12 @@ void Board::set_piece(coord xy, Piece piece)
     }
 }
 
-Piece Board::get_piece(coord xy) const
+Piece Board::get_piece(Coord xy) const
 {
     return this->board_vec[xy.y][xy.x];
 }
 
-bool Board::is_in_bounds(coord xy) const
+bool Board::is_in_bounds(Coord xy) const
 {
     if (xy.x < 0 || xy.y < 0) {
         return false;
@@ -92,7 +75,6 @@ bool Board::is_in_bounds(coord xy) const
 
 std::string Board::stringify()
 {
-    // TODO: stringstream
     std::string s = "";
 
     unsigned row_count = 0;

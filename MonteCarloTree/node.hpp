@@ -7,35 +7,27 @@
 
 template <typename S, typename A>
 class Node {
-    unsigned plays;
-    unsigned wins;
+    unsigned plays = 0;
+    unsigned wins = 0;
     S game_state;
-    A action;
+    A action = A{};
 
-    Node<S, A>* parent;
-    std::vector<std::shared_ptr<Node<S, A>>> children;
+    Node<S, A>* parent = nullptr;
+    std::vector<std::shared_ptr<Node<S, A> > > children;
 
 public:
-    Node(S&& _game_state, A _action = { 0, 0 }, Node* _parent = nullptr)
-        : plays(0)
-        , wins(0)
-        , game_state(std::move(_game_state))
+    Node(S&& _game_state, A _action = A{}, Node* _parent = nullptr)
+        : game_state(std::move(_game_state))
         , action(_action)
         , parent(_parent)
-        , children(std::vector<std::shared_ptr<Node<S, A>>>{})
     {
-    }
-
-    ~Node()
-    {
-        //std::cout << "node destroyed.\n";
     }
 
     Node() = delete;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
-    void add_child(std::shared_ptr<Node<S, A>> child)
+    void add_child(std::shared_ptr<Node<S, A> > child)
     {
         this->children.push_back(child);
     }

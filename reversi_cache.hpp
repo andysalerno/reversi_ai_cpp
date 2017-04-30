@@ -6,14 +6,14 @@
 #include <vector>
 
 class ReversiCache {
-    std::pair<GameState, std::vector<coord>> A;
-    std::pair<GameState, std::vector<coord>> B;
-    std::pair<GameState, std::vector<coord>> C;
+    std::pair<GameState, std::vector<Coord> > A;
+    std::pair<GameState, std::vector<Coord> > B;
+    std::pair<GameState, std::vector<Coord> > C;
 
     decltype(&A) rolling_ptr = &A;
 
 public:
-    void insert(Board _board, Piece color, std::vector<coord> legal_moves)
+    void insert(Board _board, Piece color, std::vector<Coord> legal_moves)
     {
         GameState game_state(_board, legal_moves, color);
         *rolling_ptr = std::make_pair(std::move(game_state), legal_moves);
@@ -27,7 +27,7 @@ public:
         }
     }
 
-    bool try_query_cache(const Board& _board, Piece color, std::vector<coord>& result) const
+    bool try_query_cache(const Board& _board, Piece color, std::vector<Coord>& result) const
     {
         if (A.first.get_player_turn() == color && A.first.get_board() == _board) {
             result = A.second;

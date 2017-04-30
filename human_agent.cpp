@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-coord human_agent::pick_move(const GameState& game_state)
+Coord human_agent::pick_move(const GameState& game_state)
 {
     const auto& board = game_state.get_board();
     const auto& legal_moves = game_state.get_legal_moves();
@@ -26,7 +26,7 @@ coord human_agent::pick_move(const GameState& game_state)
             continue;
         }
 
-        coord move = { user_x, user_y };
+        Coord move = { user_x, user_y };
         if (std::find(std::begin(legal_moves), std::end(legal_moves), move) != std::end(legal_moves)) {
             return { user_x, user_y };
         } else {

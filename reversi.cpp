@@ -14,18 +14,15 @@
 #include <unordered_map>
 #include <vector>
 
-static std::unordered_map<Board, std::vector<coord>> legal_cache_white;
-static std::unordered_map<Board, std::vector<coord>> legal_cache_black;
-
 int main()
 {
     Board _board;
 
-    auto black_agent = std::unique_ptr<agent>(new MonteCarloAgent{ black });
-    auto white_agent = std::unique_ptr<agent>(new MonteCarloAgent{ white });
+    auto black_agent = std::unique_ptr<Agent>(new MonteCarloAgent{ black });
+    auto white_agent = std::unique_ptr<Agent>(new MonteCarloAgent{ white });
 
     initialize_reversi_board(_board);
-    Piece winner = play_game(_board, black_agent, white_agent, black);
+    Piece winner = play_game(_board, *black_agent, *white_agent, black);
 
     std::string black_name("black");
     std::string white_name("white");
@@ -37,7 +34,7 @@ int main()
     std::cout << "winner: " << *winner_ptr << std::endl;
 }
 
-Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_ptr<agent>& white_agent, Piece player_turn, bool silent /* default false */)
+Piece play_game(Board& _board, Agent& black_agent, Agent& white_agent, Piece player_turn, bool silent /* default false */)
 {
     enforce(player_turn == white || player_turn == black, "player_turn must be white or black");
     const std::string black_name{ "Black" };
@@ -45,13 +42,13 @@ Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_
 
     show(_board.stringify(), silent);
 
-    agent* whose_turn;
+    Agent* whose_turn;
     const std::string* color_name;
     if (player_turn == white) {
-        whose_turn = white_agent.get();
+        whose_turn = &white_agent;
         color_name = &white_name;
     } else if (player_turn == black) {
-        whose_turn = black_agent.get();
+        whose_turn = &black_agent;
         color_name = &black_name;
     } else {
         enforce(false, "player_turn was not white or black");
@@ -63,7 +60,7 @@ Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_
         auto moves = legal_moves(_board, whose_turn->color);
         GameState game_state{ _board, moves, whose_turn->color };
         if (moves.size() > 0) {
-            coord move = whose_turn->pick_move(game_state);
+            Coord move = whose_turn->pick_move(game_state);
             show(*color_name + " plays at: " + move.stringify() + '\n', silent);
             apply_move(_board, whose_turn->color, move);
         } else {
@@ -71,11 +68,11 @@ Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_
         }
         show(_board.stringify(), silent);
 
-        if (whose_turn == white_agent.get()) {
-            whose_turn = black_agent.get();
+        if (whose_turn == &white_agent) {
+            whose_turn = &black_agent;
             color_name = &black_name;
         } else {
-            whose_turn = white_agent.get();
+            whose_turn = &white_agent;
             color_name = &white_name;
         }
     }
@@ -85,39 +82,18 @@ Piece play_game(Board& _board, std::unique_ptr<agent>& black_agent, std::unique_
     return most_pieces(_board);
 }
 
-std::vector<coord> legal_moves(const Board& _board, Piece player_color)
+std::vector<Coord> legal_moves(const Board& _board, Piece player_color)
 {
-    decltype(&legal_cache_black) cache_ptr;
-    if (player_color == black) {
-        cache_ptr = &legal_cache_black;
-    } else if (player_color == white) {
-        cache_ptr = &legal_cache_white;
-    } else {
-        enforce(false, "player_color was neither black nor white");
-    }
-
-    auto cache_result = cache_ptr->find(_board);
-    if (cache_result != cache_ptr->end()) {
-        return cache_result->second;
-    }
-
-    // std::vector<coord> cached_moves{};
-    // if (legal_cache.try_query_cache(_board, cached_moves)) {
-    //     return cached_moves;
-    // }
-
-    std::vector<coord> ret;
+    std::vector<Coord> ret;
     for (unsigned y = 0; y < _board.get_size(); ++y) {
         for (unsigned x = 0; x < _board.get_size(); ++x) {
-            coord xy = { x, y };
+            Coord xy = { x, y };
             if (is_legal_move(xy, _board, player_color)) {
                 ret.push_back(xy);
             }
         }
     }
 
-    cache_ptr->insert({ _board, ret });
-    //legal_cache.insert(_board, ret);
     return ret;
 }
 
@@ -142,7 +118,7 @@ Piece most_pieces(const Board& board)
     }
 }
 
-bool is_legal_move(coord& move, const Board& _board, Piece player_color)
+bool is_legal_move(Coord& move, const Board& _board, Piece player_color)
 {
     if (!_board.is_in_bounds(move) || _board.get_piece(move) != empty) {
         return false;
@@ -163,7 +139,7 @@ bool is_legal_move(coord& move, const Board& _board, Piece player_color)
     return false;
 }
 
-bool is_direction_valid_move(const Board& _board, const coord& move, Piece player_color, int dx, int dy)
+bool is_direction_valid_move(const Board& _board, const Coord& move, Piece player_color, int dx, int dy)
 {
     if (dx == 0 && dy == 0) {
         return false;
@@ -200,7 +176,7 @@ bool is_direction_valid_move(const Board& _board, const coord& move, Piece playe
     }
 }
 
-bool apply_move(Board& _board, Piece player_color, const coord& move)
+bool apply_move(Board& _board, Piece player_color, const Coord& move)
 {
     std::vector<direction> directions_to_flip;
 
@@ -221,7 +197,7 @@ bool apply_move(Board& _board, Piece player_color, const coord& move)
     for (const auto& direction : directions_to_flip) {
         unsigned distance = 1;
         while (true) {
-            coord flip_coord = { move.x + (direction.dx * distance), move.y + (direction.dy * distance) };
+            Coord flip_coord = { move.x + (direction.dx * distance), move.y + (direction.dy * distance) };
             Piece flip_piece = _board.get_piece(flip_coord);
             assert(flip_piece == player_color || flip_piece == opponent(player_color));
             if (flip_piece == opponent(player_color)) {
@@ -256,10 +232,10 @@ void initialize_reversi_board(Board& _board)
     unsigned midpoint_lower = (_board.get_size() - 1) / 2;
     unsigned midpoint_upper = midpoint_lower + 1;
 
-    coord top_left = { midpoint_lower, midpoint_upper };
-    coord top_right = { midpoint_upper, midpoint_upper };
-    coord bot_left = { midpoint_lower, midpoint_lower };
-    coord bot_right = { midpoint_upper, midpoint_lower };
+    Coord top_left = { midpoint_lower, midpoint_upper };
+    Coord top_right = { midpoint_upper, midpoint_upper };
+    Coord bot_left = { midpoint_lower, midpoint_lower };
+    Coord bot_right = { midpoint_upper, midpoint_lower };
 
     _board.set_piece(top_left, black);
     _board.set_piece(top_right, white);
