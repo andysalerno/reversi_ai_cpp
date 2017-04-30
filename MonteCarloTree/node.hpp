@@ -12,8 +12,8 @@ class Node {
     S game_state;
     A action = A{};
 
-    Node<S, A>* parent = nullptr;
-    std::vector<std::shared_ptr<Node<S, A> > > children;
+    Node* parent = nullptr;
+    std::vector<std::unique_ptr<Node> > children;
 
 public:
     Node(S&& _game_state, A _action = A{}, Node* _parent = nullptr)
@@ -23,13 +23,15 @@ public:
     {
     }
 
-    Node() = delete;
+    Node(Node&&) = default;
+    Node(){};
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
-    void add_child(std::shared_ptr<Node<S, A> > child)
+    Node& add_child(Node&& child)
     {
-        this->children.push_back(child);
+        this->children.push_back(std::make_unique<Node>(std::move(child)));
+        return *(this->children.back());
     }
 
     const auto& get_children() const
@@ -57,7 +59,7 @@ public:
         this->wins = this->wins + result;
     }
 
-    Node<S, A>* get_parent() const
+    Node* get_parent() const
     {
         return this->parent;
     }

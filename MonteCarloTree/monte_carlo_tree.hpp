@@ -3,49 +3,53 @@
 
 #include "node.hpp"
 #include <functional>
+#include <memory>
 #include <unordered_map>
 
 template <typename S, typename A>
 class MonteCarloTree {
     using Node = Node<S, A>;
     using StateRef = std::reference_wrapper<const S>;
+    using NodeRef = std::reference_wrapper<Node>;
 
-    std::unordered_map<StateRef, std::shared_ptr<Node> > state_to_node;
-    std::shared_ptr<Node> root;
+    std::unordered_map<StateRef, NodeRef> state_to_node;
+    std::unique_ptr<Node> root;
 
 public:
-    std::shared_ptr<Node> get_existing_node(const S& game_state)
+    Node* get_existing_node(const S& game_state)
     {
-        auto check = state_to_node.find(StateRef(game_state));
-        if (check == state_to_node.end()) {
-            return std::shared_ptr<Node>(nullptr);
-        }
+        return nullptr;
+        // auto check = state_to_node.find(std::cref(game_state));
+        // if (check == state_to_node.end()) {
+        //     return nullptr;
+        // }
 
-        auto node_ptr = check->second;
-        return node_ptr;
+        // Node& node = check->second;
+        // return &node;
     }
 
-    std::shared_ptr<Node> add_node(S&& game_state, A action, Node& parent)
+    Node& add_node(S&& game_state, A action, Node& parent)
     {
-        auto node_ptr = std::make_shared<Node>(std::move(game_state), action, &parent);
-        parent.add_child(node_ptr);
+        // auto node_ptr = std::make_unique<Node>(std::move(game_state), action, &parent);
+        auto new_node = Node{ std::move(game_state), action, &parent };
+        auto& added_child = parent.add_child(std::move(new_node));
 
-        state_to_node[StateRef{ node_ptr->get_game_state() }] = node_ptr;
-        return node_ptr;
+        //state_to_node[std::cref(added_child.get_game_state())] = std::ref(added_child);
+        return added_child;
     }
 
-    std::shared_ptr<Node> add_root_node(S&& game_state)
+    Node& add_root_node(S&& game_state)
     {
-        auto node_ptr = std::make_shared<Node>(std::move(game_state));
-        this->root = node_ptr;
-        state_to_node[StateRef{ this->root->get_game_state() }] = this->root;
-        return node_ptr;
+        this->root = std::make_unique<Node>(std::move(game_state));
+        //state_to_node[std::cref(this->root->get_game_state())] = std::ref(*(this->root));
+        return *(this->root);
     }
 
-    std::shared_ptr<Node> add_root_node(const S& game_state)
+    Node& add_root_node(const S& game_state)
     {
         S copy = game_state;
-        return this->add_root_node(std::move(copy));
+        auto& root = this->add_root_node(std::move(copy));
+        return root;
     }
 };
 
