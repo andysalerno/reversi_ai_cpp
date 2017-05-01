@@ -42,23 +42,40 @@ public:
     }
 };
 
-namespace std {
-template <>
-struct hash<std::reference_wrapper<const GameState> > {
-    std::size_t operator()(std::reference_wrapper<const GameState> const& game_state_ref) const
+inline bool operator==(const GameState& lhs, const GameState& rhs)
+{
+    return lhs.get_board() == rhs.get_board()
+        && lhs.get_player_turn() == rhs.get_player_turn();
+}
+
+// namespace std {
+// template <>
+// struct hash<std::reference_wrapper<const GameState> > {
+//     std::size_t operator()(const std::reference_wrapper<const GameState>& game_state) const
+//     {
+//         const GameState& gs = game_state;
+//         size_t val = std::hash<Board>{}(gs.get_board());
+//         val += 17 * ((size_t)gs.get_player_turn() + 3);
+//         return val;
+//     }
+// };
+// }
+
+struct GameStateRefEqualTo {
+    bool operator()(const std::reference_wrapper<const GameState>& lhs,
+        const std::reference_wrapper<const GameState>& rhs) const
     {
-        const GameState& game_state = game_state_ref.get();
+        return lhs.get() == rhs.get();
+    }
+};
+
+struct GameStateHash {
+    std::size_t operator()(const GameState& game_state) const
+    {
         size_t val = std::hash<Board>{}(game_state.get_board());
         val += 17 * ((size_t)game_state.get_player_turn() + 3);
         return val;
     }
 };
-}
-
-inline bool operator==(const std::reference_wrapper<const GameState>& lhs, const std::reference_wrapper<const GameState>& rhs)
-{
-    return lhs.get().get_board() == rhs.get().get_board()
-        && lhs.get().get_player_turn() == rhs.get().get_player_turn();
-}
 
 #endif
