@@ -27,6 +27,7 @@ public:
     Node(){};
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
+    Node& operator=(Node&&) = default;
 
     Node& add_child(Node&& child)
     {

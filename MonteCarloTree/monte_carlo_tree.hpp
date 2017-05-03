@@ -50,6 +50,18 @@ public:
         auto& root = this->add_root_node(std::move(copy));
         return root;
     }
+
+    void set_root(const Node& new_root)
+    {
+        // move unique_ptr from parent to the root_ptr
+        auto parent_ptr = new_root.get_parent();
+        for (const auto& child : parent_ptr->get_children()) {
+            if (child.get() == this->root.get()) {
+                this->root.reset(child.get());
+            }
+            break;
+        }
+    }
 };
 
 #endif
