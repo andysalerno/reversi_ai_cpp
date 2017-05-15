@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
+#include <sstream>
 
 using Tree = MonteCarloTree<GameState, Coord>;
 
@@ -16,14 +17,15 @@ Coord MonteCarloAgent::pick_move(const GameState& game_state)
 
 Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
 {
-    auto tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
+    //auto tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
+    ReversiNode* tree_root_ptr = nullptr;
 
     if (tree_root_ptr == nullptr) {
         tree_root_ptr = &(this->reversi_tree.add_root_node(game_state));
     }
 
-    using clock = std::chrono::system_clock;
     const auto timespan = std::chrono::seconds{ SIM_TIME_SEC };
+    using clock = std::chrono::system_clock;
     auto start_time = clock::now();
 
     unsigned simulations = 0;
@@ -97,7 +99,6 @@ ReversiNode& MonteCarloAgent::tree_policy(ReversiNode& node)
 
         // there was not an unplayed child, so recurse with UCB
         return this->tree_policy(best_child(node));
-        //return best_child(node_ptr);
     }
 }
 
@@ -135,7 +136,7 @@ ReversiNode& MonteCarloAgent::best_child(ReversiNode& root)
 {
     const bool is_enemy_turn = root.get_game_state().get_player_turn() != this->color;
     const double C = 1; // exploration value
-    std::vector<std::pair<ReversiNode*, double> > node_scores;
+    std::vector<std::pair<ReversiNode*, double>> node_scores;
     unsigned parent_plays = root.get_plays();
 
     for (const auto& child_ptr : root.get_children()) {
@@ -165,9 +166,9 @@ ReversiNode& MonteCarloAgent::best_child(ReversiNode& root)
     return *best_node_ptr;
 }
 
-std::string MonteCarloAgent::node_scores_str(const std::vector<std::unique_ptr<ReversiNode> >& nodes) const
+std::string MonteCarloAgent::node_scores_str(const std::vector<std::unique_ptr<ReversiNode>>& nodes) const
 {
-    std::vector<std::reference_wrapper<const ReversiNode> > sorted{};
+    std::vector<std::reference_wrapper<const ReversiNode>> sorted{};
     for (const auto& node : nodes) {
         sorted.push_back(std::cref(*node));
     }
@@ -192,7 +193,7 @@ std::string MonteCarloAgent::node_scores_str(const std::vector<std::unique_ptr<R
     return stream.str();
 }
 
-ReversiNode& MonteCarloAgent::winningest_node(const std::vector<std::unique_ptr<ReversiNode> >& nodes) const
+ReversiNode& MonteCarloAgent::winningest_node(const std::vector<std::unique_ptr<ReversiNode>>& nodes) const
 {
     ReversiNode* best_node = nullptr;
     unsigned most_plays = 0;

@@ -3,6 +3,7 @@
 
 #include "../util.hpp"
 #include <memory>
+#include <utility>
 #include <vector>
 
 template <typename S, typename A>
@@ -13,11 +14,11 @@ class Node {
     A action = A{};
 
     Node* parent = nullptr;
-    std::vector<std::unique_ptr<Node> > children;
+    std::vector<std::unique_ptr<Node>> children;
 
 public:
     Node(S&& _game_state, A _action = A{}, Node* _parent = nullptr)
-        : game_state(std::move(_game_state))
+        : game_state(std::forward<S>(_game_state))
         , action(_action)
         , parent(_parent)
     {
