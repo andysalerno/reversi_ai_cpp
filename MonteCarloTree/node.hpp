@@ -24,10 +24,11 @@ public:
     {
     }
 
-    Node(Node&&) = default;
+    Node(Node&&) noexcept = default;
     Node(){};
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
+    Node& operator=(Node&&) = default;
 
     Node& add_child(Node&& child)
     {
