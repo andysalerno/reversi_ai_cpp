@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+#include <utility>
 
 template <typename S, typename A>
 class MonteCarloTree {
@@ -30,7 +31,7 @@ public:
 
     Node& add_node(S&& game_state, A action, Node& parent)
     {
-        auto new_node = Node{ std::move(game_state), action, &parent };
+        auto new_node = Node{ std::forward<S>(game_state), action, &parent };
         auto& added_child = parent.add_child(std::move(new_node));
 
         state_to_node.insert({ std::cref(added_child.get_game_state()), std::ref(added_child) });
@@ -39,7 +40,7 @@ public:
 
     Node& add_root_node(S&& game_state)
     {
-        this->root = std::make_unique<Node>(std::move(game_state));
+        this->root = std::make_unique<Node>(std::forward<S>(game_state));
         state_to_node.insert({ std::cref(this->root->get_game_state()), std::ref(*(this->root)) });
         return *(this->root);
     }

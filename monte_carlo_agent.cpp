@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
+#include <sstream>
 
 using Tree = MonteCarloTree<GameState, Coord>;
 
@@ -17,7 +18,8 @@ Coord MonteCarloAgent::pick_move(const GameState& game_state)
 
 Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
 {
-    auto tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
+    //auto tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
+    ReversiNode* tree_root_ptr = nullptr;
 
     if (tree_root_ptr == nullptr) {
         tree_root_ptr = &(this->reversi_tree.add_root_node(game_state));
@@ -25,8 +27,8 @@ Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
         this->reversi_tree.set_root(*tree_root_ptr);
     }
 
-    using clock = std::chrono::system_clock;
     const auto timespan = std::chrono::seconds{ SIM_TIME_SEC };
+    using clock = std::chrono::system_clock;
     auto start_time = clock::now();
 
     unsigned simulations = 0;
@@ -101,7 +103,6 @@ ReversiNode& MonteCarloAgent::tree_policy(ReversiNode& node)
 
         // there was not an unplayed child, so recurse with UCB
         return this->tree_policy(best_child(node));
-        //return best_child(node_ptr);
     }
 }
 

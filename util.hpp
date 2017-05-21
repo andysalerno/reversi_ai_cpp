@@ -7,13 +7,13 @@
 #include <string>
 #include <vector>
 
+static std::mt19937 rand_gen{ std::random_device{}() };
+
 template <typename T>
 T vec_pick_random(const std::vector<T>& vec)
 {
-    std::random_device rd;
-    std::mt19937 engine{ rd() };
-    std::uniform_int_distribution<int> index(0, vec.size() - 1);
-    return vec[index(engine)];
+    std::uniform_int_distribution<int> index{ 0, static_cast<int>(vec.size()) - 1 };
+    return vec[index(rand_gen)];
 }
 
 inline void enforce(bool expression, std::string reason)
