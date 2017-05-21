@@ -1,6 +1,7 @@
 #ifndef COORD_HPP
 #define COORD_HPP
 
+#include <cstddef>
 #include <string>
 
 struct Coord {
@@ -21,7 +22,7 @@ inline bool operator==(const Coord& lhs, const Coord& rhs)
 namespace std {
 template <>
 struct hash<Coord> {
-    std::size_t operator()(Coord const& coord) const
+    std::size_t operator()(const Coord& coord) const
     {
         return (coord.x * 127) + coord.y;
     }
