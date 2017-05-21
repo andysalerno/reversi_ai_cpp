@@ -22,6 +22,8 @@ Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
 
     if (tree_root_ptr == nullptr) {
         tree_root_ptr = &(this->reversi_tree.add_root_node(game_state));
+    } else {
+        this->reversi_tree.set_root(*tree_root_ptr);
     }
 
     const auto timespan = std::chrono::seconds{ SIM_TIME_SEC };
@@ -60,7 +62,8 @@ ReversiNode& MonteCarloAgent::tree_policy(ReversiNode& node)
             // no available moves + game is NOT over, so must pass turn
             // passing a turn acts as a "move" and gets its own node
             auto pass_legal_moves = legal_moves(board, opponent(this->color));
-            GameState pass_state{ board, pass_legal_moves, opponent(this->color) };
+            auto board_copy = board;
+            GameState pass_state{ std::move(board_copy), std::move(pass_legal_moves), opponent(this->color) };
             ReversiNode& pass_node = this->reversi_tree.add_node(std::move(pass_state), { 0, 0 }, node); // TODO: move coord should not be {0, 0}
             return pass_node;
         }

@@ -48,19 +48,6 @@ inline bool operator==(const GameState& lhs, const GameState& rhs)
         && lhs.get_player_turn() == rhs.get_player_turn();
 }
 
-// namespace std {
-// template <>
-// struct hash<std::reference_wrapper<const GameState> > {
-//     std::size_t operator()(const std::reference_wrapper<const GameState>& game_state) const
-//     {
-//         const GameState& gs = game_state;
-//         size_t val = std::hash<Board>{}(gs.get_board());
-//         val += 17 * ((size_t)gs.get_player_turn() + 3);
-//         return val;
-//     }
-// };
-// }
-
 struct GameStateRefEqualTo {
     bool operator()(const std::reference_wrapper<const GameState>& lhs,
         const std::reference_wrapper<const GameState>& rhs) const
