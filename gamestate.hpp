@@ -48,6 +48,12 @@ inline bool operator==(const GameState& lhs, const GameState& rhs)
         && lhs.get_player_turn() == rhs.get_player_turn();
 }
 
+inline bool operator==(const std::reference_wrapper<const GameState>& lhs,
+    const std::reference_wrapper<const GameState>& rhs)
+{
+    return lhs.get() == rhs.get();
+}
+
 struct GameStateRefEqualTo {
     bool operator()(const std::reference_wrapper<const GameState>& lhs,
         const std::reference_wrapper<const GameState>& rhs) const
@@ -57,12 +63,15 @@ struct GameStateRefEqualTo {
 };
 
 struct GameStateHash {
-    std::size_t operator()(const GameState& game_state) const
+    std::size_t operator()(const std::reference_wrapper<const GameState>& game_state) const
     {
-        size_t val = std::hash<Board>{}(game_state.get_board());
-        val += 17 * ((size_t)game_state.get_player_turn() + 3);
+        size_t val = std::hash<Board>{}(game_state.get().get_board());
+        val += 17 * ((size_t)game_state.get().get_player_turn() + 3);
         return val;
     }
 };
+
+// the bug is because nodes are freed when the root node is updated
+// but references to those nodes still exist in the hashmap
 
 #endif

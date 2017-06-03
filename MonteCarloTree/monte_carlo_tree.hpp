@@ -31,10 +31,19 @@ public:
 
     Node& add_node(S&& game_state, A action, Node& parent)
     {
-        auto new_node = Node{ std::forward<S>(game_state), action, &parent };
+        auto new_node = Node{ std::move(game_state), action, &parent };
         auto& added_child = parent.add_child(std::move(new_node));
 
-        state_to_node.insert({ std::cref(added_child.get_game_state()), std::ref(added_child) });
+        auto gamestate_ref = std::cref(added_child.get_game_state());
+        auto node_ref = std::ref(added_child);
+
+        auto& stn = state_to_node;
+        auto remove_self = [this, &stn, &gamestate_ref]() {
+            stn.erase(gamestate_ref);
+        };
+        added_child.set_destructor(remove_self);
+
+        state_to_node.insert({ gamestate_ref, node_ref });
         return added_child;
     }
 
@@ -56,11 +65,15 @@ public:
     {
         // move unique_ptr from parent to the root_ptr
         auto parent_ptr = new_root.get_parent();
+        if (parent_ptr == nullptr) {
+            return;
+        }
+
         for (const auto& child : parent_ptr->get_children()) {
-            if (child.get() == this->root.get()) {
+            if (child.get() == &new_root) {
                 this->root.reset(child.get());
+                return;
             }
-            break;
         }
     }
 };

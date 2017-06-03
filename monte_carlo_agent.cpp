@@ -24,7 +24,7 @@ Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     if (tree_root_ptr == nullptr) {
         tree_root_ptr = &(this->reversi_tree.add_root_node(game_state));
     } else {
-        this->reversi_tree.set_root(*tree_root_ptr);
+        //this->reversi_tree.set_root(*tree_root_ptr);
     }
 
     const auto timespan = std::chrono::seconds{ SIM_TIME_SEC };
@@ -32,7 +32,8 @@ Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
     auto start_time = clock::now();
 
     unsigned simulations = 0;
-    while (clock::now() - start_time < timespan) {
+    //while (clock::now() - start_time < timespan) {
+    while (simulations < 1000) {
         auto& selected_node = this->tree_policy(*tree_root_ptr);
         unsigned result = this->simulate(selected_node);
         this->back_propagate(selected_node, result);

@@ -17,8 +17,8 @@ private:
     void back_propagate(ReversiNode&, unsigned result);
     unsigned simulate(ReversiNode&);
     ReversiNode& best_child(ReversiNode&);
-    std::string node_scores_str(const std::vector<std::unique_ptr<ReversiNode> >&) const;
-    ReversiNode& winningest_node(const std::vector<std::unique_ptr<ReversiNode> >&) const;
+    std::string node_scores_str(const std::vector<std::unique_ptr<ReversiNode>>&) const;
+    ReversiNode& winningest_node(const std::vector<std::unique_ptr<ReversiNode>>&) const;
 
 public:
     Coord pick_move(const GameState&);
