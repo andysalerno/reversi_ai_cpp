@@ -18,8 +18,7 @@ Coord MonteCarloAgent::pick_move(const GameState& game_state)
 
 Coord MonteCarloAgent::monte_carlo_tree_search(const GameState& game_state)
 {
-    //auto tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
-    ReversiNode* tree_root_ptr = nullptr;
+    ReversiNode* tree_root_ptr = this->reversi_tree.get_existing_node(game_state);
 
     if (tree_root_ptr == nullptr) {
         tree_root_ptr = &(this->reversi_tree.add_root_node(game_state));

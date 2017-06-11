@@ -30,18 +30,6 @@ public:
     Node& operator=(const Node&) = delete;
     Node& operator=(Node&&) = default;
 
-    std::function<void()> fire_on_destruct = []() -> void { return; };
-
-    void set_destructor(std::function<void()> func)
-    {
-        this->fire_on_destruct = func;
-    }
-
-    ~Node()
-    {
-        this->fire_on_destruct();
-    }
-
     Node& add_child(Node&& child)
     {
         this->children.push_back(std::make_unique<Node>(std::move(child)));
