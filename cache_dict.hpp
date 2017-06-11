@@ -25,7 +25,7 @@ public:
     void save(K key, V val)
     {
         std::size_t index = 0;
-        if (flip) {
+        if (flip && size >= 2) {
             index = 1;
         }
 
