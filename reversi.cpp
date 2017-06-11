@@ -1,6 +1,7 @@
 #include "reversi.hpp"
 #include "agent.hpp"
 #include "board.hpp"
+#include "cache_dict.hpp"
 #include "coord.hpp"
 #include "gamestate.hpp"
 #include "human_agent.hpp"
@@ -13,6 +14,9 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+static CacheDict<Board, std::vector<Coord>> white_cache{};
+static CacheDict<Board, std::vector<Coord>> black_cache{};
 
 int main()
 {
@@ -84,6 +88,11 @@ Piece play_game(Board& _board, Agent& black_agent, Agent& white_agent, Piece pla
 
 std::vector<Coord> legal_moves(const Board& _board, Piece player_color)
 {
+    std::vector<Coord>* cached = player_color == white ? white_cache.get(_board) : black_cache.get(_board);
+    if (cached != nullptr) {
+        return *cached;
+    }
+
     std::vector<Coord> ret;
     for (unsigned y = 0; y < _board.get_size(); ++y) {
         for (unsigned x = 0; x < _board.get_size(); ++x) {
@@ -93,6 +102,8 @@ std::vector<Coord> legal_moves(const Board& _board, Piece player_color)
             }
         }
     }
+
+    player_color == white ? white_cache.save(_board, ret) : black_cache.save(_board, ret);
 
     return ret;
 }

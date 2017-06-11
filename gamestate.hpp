@@ -26,6 +26,8 @@ public:
     {
     }
 
+    GameState() {}
+
     const Board& get_board() const
     {
         return this->board;
